@@ -1,0 +1,314 @@
+﻿@page
+@model RoadSafetyProject.Pages.pssa_engageModel
+@{
+    ViewData["Title"] = "Road Safety Project";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon.ico">
+    <title>Road Safety Project</title>
+    <!-- Bootstrap 5 -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- jsPDF AutoTable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <!--edit table-->
+    <link rel="stylesheet" type="text/css" href="css/editable-table.css" />
+    <script src="js/editable-table.js"></script>
+</head>
+<body>
+    <div class="offcanvas offcanvas-start"
+         tabindex="-1"
+         id="mobileMenu">
+        <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title">
+                RSP
+            </h5>
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="offcanvas">
+            </button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <a href="organization.html" class="text-decoration-none text-dark">
+                        <i class="bi bi-house-door me-2"></i>
+                        Organization
+                    </a>
+                </li>
+                <li class="list-group-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"><i class="bi bi-clipboard2-data me-1"></i>Projects</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="drawing.html">Drawing</a></li>
+                        <li><a class="dropdown-item" href="division.html">Division</a></li>
+                    </ul>
+                </li>
+                <li class="list-group-item">
+                    <a href="about.html" class="text-decoration-none text-dark">
+                        <i class="bi bi-people me-2"></i>
+                        About Us
+                    </a>
+                </li>
+                <li class="list-group-item">
+                    <a href="rsp-policy.html" class="text-decoration-none text-dark">
+                        <i class="bi bi-sticky-fill me-2"></i>
+                        Policy
+                    </a>
+                </li>
+                <li class="list-group-item">
+                    <a href="contact.html" class="text-decoration-none text-dark">
+                        <i class="bi bi-person-fill me-2"></i>
+                        Contact
+                    </a>
+                </li>
+                <!--<li class="list-group-item">
+                  <a href="#" class="text-decoration-none text-danger">
+                  <i class="bi bi-box-arrow-right me-2"></i>
+                  Logout
+                  </a>
+               </li>-->
+            </ul>
+        </div>
+    </div>
+    <!-- Mobile Sidebar -->
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <!-- Summary Cards -->
+        <div class="row mb-4">
+            <div class="col-md-12 mb-3">
+                <div class="container py-4">
+
+                    <!-- Message -->
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger">
+                            @Model.ErrorMessage
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                    {
+                        <div class="alert alert-success">
+                            @Model.SuccessMessage
+                        </div>
+                    }
+
+                    <h3 class="mb-3">
+                        Total Records : @Model.TotalRecords
+                    </h3>
+
+                    <!-- Entry Form -->
+
+                    <div class="card shadow mb-4">
+
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                Personnel Engage Under PSSA
+                            </h5>
+                        </div>
+
+                        <div class="card-body">
+
+                            <form method="post">
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">Sr No</label>
+                                        <input asp-for="Pssa.SRNO" class="form-control" />
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">HQ</label>
+                                        <input asp-for="Pssa.HQ" class="form-control" />
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Designation</label>
+                                        <input asp-for="Pssa.DESIGNATION" class="form-control" />
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Nominated Work</label>
+                                        <input asp-for="Pssa.NOMITEDWORK" class="form-control" />
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">Name Of POC</label>
+                                        <input asp-for="Pssa.NAMEOFPOC" class="form-control" />
+                                    </div>
+
+                                </div>
+
+                                <div class="mt-4">
+
+                                    <button asp-page-handler="Save"
+                                            class="btn btn-success">
+                                        Save
+                                    </button>
+
+                                    <button asp-page-handler="Update"
+                                            type="submit"
+                                            class="btn btn-warning">
+                                        <i class="bi bi-pencil-square"></i>
+                                        Update
+                                    </button>
+
+                                    <button asp-page-handler="Delete"
+                                            type="submit"
+                                            class="btn btn-danger"
+                                            onclick="return confirm('Delete this record?');">
+                                        <i class="bi bi-trash"></i>
+                                        Delete
+                                    </button>
+
+                                    <button type="reset"
+                                            class="btn btn-secondary">
+                                        Clear
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Existing Table -->
+
+                    <div class="pssa-table">
+
+                        <div class="row table-title g-0">
+                            <div class="col-12">
+                                Personnel engage under PSSA
+                            </div>
+                        </div>
+
+                        <div class="row table-header g-0 d-none d-md-flex">
+
+                            <div class="col-md-1 border-cell">
+                                Sr No.
+                            </div>
+
+                            <div class="col-md-2 border-cell">
+                                HQ
+                            </div>
+
+                            <div class="col-md-3 border-cell">
+                                Designation
+                            </div>
+
+                            <div class="col-md-3 border-cell">
+                                Nominated Work
+                            </div>
+
+                            <div class="col-md-2 border-cell">
+                                Name of POC
+                            </div>
+
+                            <div class="col-md-1 border-cell text-center">
+                                Action
+                            </div>
+
+                        </div>
+
+                        @foreach (var item in Model.PssaList)
+                        {
+                            <div class="row table-row g-0">
+
+                                <div class="col-12 d-md-none mobile-title">
+                                    Personnel Details
+                                </div>
+
+                                <div class="col-md-1 col-6 border-cell">
+                                    <span class="mobile-label">Sr No.</span>
+                                    @item.SRNO
+                                </div>
+
+                                <div class="col-md-2 col-6 border-cell">
+                                    <span class="mobile-label">HQ</span>
+                                    @item.HQ
+                                </div>
+
+                                <div class="col-md-3 col-12 border-cell">
+                                    <span class="mobile-label">Designation</span>
+                                    @item.DESIGNATION
+                                </div>
+
+                                <div class="col-md-3 col-12 border-cell">
+                                    <span class="mobile-label">Nominated Work</span>
+                                    @item.NOMITEDWORK
+                                </div>
+
+                                <div class="col-md-2 col-12 border-cell">
+                                    <span class="mobile-label">POC</span>
+                                    @item.NAMEOFPOC
+                                </div>
+
+                                <div class="col-md-1 col-12 border-cell text-center">
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-primary editBtn"
+                                            data-srno="@item.SRNO"
+                                            data-hq="@item.HQ"
+                                            data-designation="@item.DESIGNATION"
+                                            data-work="@item.NOMITEDWORK"
+                                            data-poc="@item.NAMEOFPOC">
+
+                                        <i class="bi bi-pencil"></i>
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+            document.querySelectorAll(".editBtn").forEach(btn => {
+
+                btn.addEventListener("click", function() {
+
+                    document.getElementById("Pssa_SRNO").value = this.dataset.srno;
+                    document.getElementById("Pssa_HQ").value = this.dataset.hq;
+                    document.getElementById("Pssa_DESIGNATION").value = this.dataset.designation;
+                    document.getElementById("Pssa_NOMITEDWORK").value = this.dataset.work;
+                    document.getElementById("Pssa_NAMEOFPOC").value = this.dataset.poc;
+
+                    window.scrollTo({
+                        top: 0,
+                        behavior: "smooth"
+                    });
+
+                });
+
+            });
+    </script>
+</body>
+</html>

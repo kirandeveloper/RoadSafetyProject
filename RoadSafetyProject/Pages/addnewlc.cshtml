@@ -1,0 +1,792 @@
+@page
+@model RoadSafetyProject.Pages.addnewlcModel
+@{
+    ViewData["Title"] = "Road Safety Project";
+}
+@Html.AntiForgeryToken()
+<div class="content-wrapper">
+    <!-- Summary Cards -->
+    <div class="container mb-4">
+        <div class="col-md-12">
+            <div class="form-card">
+                <div class="rob-sheet">
+                    <!-- Title block -->
+                    <div class="rob-titleblock">
+                        <div>
+                            <div class="eyebrow">Road Over Bridge · Project Data Sheet</div>
+                            <h1>Add New LC Form</h1>
+                        </div>
+                        <div class="rob-meta">
+                            Form ref: ROB/DS/2026<br>
+                            All fields marked * are mandatory
+                        </div>
+                        <div class="rob-progress" style="width:100%;">
+                            <div class="rob-progress-fill" id="progressFill"></div>
+                        </div>
+                    </div>
+
+                    <form id="robForm" class="needs-validation" novalidate>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">LC Status</label><br />
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="LcStatus" id="statusSanction" value="Sanction" checked>
+                                    <label class="form-check-label" for="statusSanction">Sanction</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="LcStatus" id="statusUnSanction" value="UnSanction">
+                                    <label class="form-check-label" for="statusUnSanction">UnSanction</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="recordId" name="id" value="0" />
+
+                        <!-- 01 Basic Details -->
+                        <div class="rob-panel">
+                            <div class="section-title">
+                                <span class="num">01</span>
+                                <span class="txt">Basic Details</span>
+                                <span class="sub">Sanction &amp; Location</span>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="division" name="division" placeholder=" " required />
+                                        <label for="division" class="req-label">Enter Division</label>
+                                    </div>
+                                    <div class="invalid-feedback">Division is required.</div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="yearSanction" name="yearSanction" placeholder=" " required min="1950" max="2100" step="1" />
+                                        <label for="yearSanction" class="req-label">Year of Sanction</label>
+                                    </div>
+                                    <div class="invalid-feedback">Enter a valid 4-digit year (1950–2100).</div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="lcNo" name="lcNo"
+                                               placeholder=" " required pattern="^[A-Za-z0-9\-/]{2,20}$">
+                                        <label for="lcNo" class="req-label">LC No.</label>
+                                    </div>
+                                    <div class="invalid-feedback">Use letters, numbers, "-" or "/" only.</div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="locationKm" name="locationKm"
+                                               placeholder=" " required pattern="^\d{1,4}(\.\d{1,3})?$"
+                                               inputmode="decimal" />
+                                        <label for="locationKm" class="req-label">Location Km</label>
+                                    </div>
+                                    <div class="invalid-feedback">Enter chainage as a number, e.g. 42.350.</div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="section" name="section"
+                                               placeholder=" " required minlength="2">
+                                        <label for="section" class="req-label">Section</label>
+                                    </div>
+                                    <div class="invalid-feedback">Section name is required.</div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="spanArrangement" name="spanArrangement"
+                                               placeholder=" " required>
+                                        <label for="spanArrangement" class="req-label">Span Arrangement</label>
+                                    </div>
+                                    <div class="invalid-feedback">Span arrangement is required, e.g. 3x18.3m.</div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="skewAngle" name="skewAngle"
+                                               placeholder=" " required min="0" max="90" step="0.1">
+                                        <label for="skewAngle" class="req-label">Skew Angle (°)</label>
+                                    </div>
+                                    <div class="invalid-feedback">Skew angle must be between 0° and 90°.</div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="distanceLc" name="distanceLc"
+                                               placeholder=" " required min="0" step="1">
+                                        <label for="distanceLc" class="req-label">Distance from Existing LC (m)</label>
+                                    </div>
+                                    <div class="invalid-feedback">Enter distance in metres (0 or more).</div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="stateApproval" name="stateApproval"
+                                               placeholder=" " required minlength="2">
+                                        <label for="stateApproval" class="req-label">State Authority Approval on Plan / GAD</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="dprConsultancy" name="dprConsultancy"
+                                               placeholder=" " required minlength="2">
+                                        <label for="dprConsultancy" class="req-label">Name of DPR Consultancy</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="executiveAgency" name="executiveAgency"
+                                               placeholder=" " required minlength="2">
+                                        <label for="executiveAgency" class="req-label">Name of Executive Agency</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 01 Basic Details -->
+                        <!-- 02 Tender Details -->
+                        <div class="rob-panel">
+                            <div class="section-title">
+                                <span class="num">02</span>
+                                <span class="txt">Tender Details</span>
+                                <span class="sub">Cost &amp; Status</span>
+                            </div>
+                            <div class="row">
+
+                                <div class="col-md-2 mb-3">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="gad" name="gad" required>
+                                            <option value="" disabled selected hidden>Select</option>
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                        <label for="gad" class="req-label">GAD</label>
+                                    </div>
+                                    <div class="invalid-feedback">Please select an option.</div>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="checkedReceived" name="checkedReceived" required>
+                                            <option value="" disabled selected hidden>Select</option>
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                        <label for="checkedReceived" class="req-label">Checked &amp; Received</label>
+                                    </div>
+                                    <div class="invalid-feedback">Please select an option.</div>
+                                </div>
+
+                                <div class="col-md-2 mb-3">
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="sanctionedCont" name="sanctionedCont"
+                                               placeholder=" " required min="0" step="0.01">
+                                        <label for="sanctionedCont" class="req-label">Sanctioned Cont (Cr)</label>
+                                    </div>
+                                    <div class="invalid-feedback">Enter a non-negative amount.</div>
+                                </div>
+
+                                <div class="col-md-2 mb-3">
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="sanctionedDe" name="sanctionedDe"
+                                               placeholder=" " required min="0" step="0.01">
+                                        <label for="sanctionedDe" class="req-label">Sanctioned DE (Cr)</label>
+                                    </div>
+                                    <div class="invalid-feedback">Enter a non-negative amount.</div>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="tenderStatus" name="tenderStatus"
+                                               placeholder=" " required minlength="2">
+                                        <label for="tenderStatus" class="req-label">Status of Tender</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- 02 Tender Details -->
+                        <!-- 03 Land Acquisition -->
+                        <div class="rob-panel">
+                            <div class="section-title">
+                                <span class="num">03</span>
+                                <span class="txt">Land Acquisition</span>
+                                <span class="sub">Notifications &amp; Awards</span>
+                            </div>
+                            <div class="row">
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="sec7a" name="sec7a" placeholder=" " required minlength="2"></textarea>
+                                        <label for="sec7a" class="req-label">7A / 37A</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="sec20aGazette" name="sec20aGazette" placeholder=" " required minlength="2"></textarea>
+                                        <label for="sec20aGazette" class="req-label">20A Gazette Notification</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="sec20aPaper" name="sec20aPaper" placeholder=" " required minlength="2"></textarea>
+                                        <label for="sec20aPaper" class="req-label">20A Paper Publication</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="sec20b" name="sec20b" placeholder=" " required minlength="2"></textarea>
+                                        <label for="sec20b" class="req-label">20B</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="sec20c" name="sec20c" placeholder=" " required minlength="2"></textarea>
+                                        <label for="sec20c" class="req-label">20C</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="sec20d" name="sec20d" placeholder=" " required minlength="2"></textarea>
+                                        <label for="sec20d" class="req-label">20D</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="sec20eGazette" name="sec20eGazette" placeholder=" " required minlength="2"></textarea>
+                                        <label for="sec20eGazette" class="req-label">20E Gazette Notification</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="sec20ePaper" name="sec20ePaper" placeholder=" " required minlength="2"></textarea>
+                                        <label for="sec20ePaper" class="req-label">20E Paper Publication</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="sec20f" name="sec20f" placeholder=" " required minlength="2"></textarea>
+                                        <label for="sec20f" class="req-label">20F</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="landRemark" name="landRemark" placeholder=" " required minlength="2"></textarea>
+                                        <label for="landRemark" class="req-label">Remark</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- 03 Land Acquisition -->
+                        <!-- 04 Utility Shifting -->
+                        <div class="rob-panel">
+                            <div class="section-title">
+                                <span class="num">04</span>
+                                <span class="txt">Utility Shifting</span>
+                                <span class="sub">S&amp;T · TRD · Electrical</span>
+                            </div>
+                            <div class="row">
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="utilSnt" name="utilSnt" placeholder=" " required minlength="2"></textarea>
+                                        <label for="utilSnt" class="req-label">S &amp; T</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="utilTrd" name="utilTrd" placeholder=" " required minlength="2"></textarea>
+                                        <label for="utilTrd" class="req-label">TRD</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="utilElectrical" name="utilElectrical" placeholder=" " required minlength="2"></textarea>
+                                        <label for="utilElectrical" class="req-label">Electrical (G)</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- 04 Utility Shifting -->
+                        <!-- 05 Design -->
+                        <div class="rob-panel">
+                            <div class="section-title">
+                                <span class="num">05</span>
+                                <span class="txt">Design</span>
+                                <span class="sub">Structure &amp; Exits</span>
+                            </div>
+                            <div class="row">
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="substructure" name="substructure" placeholder=" " required minlength="2"></textarea>
+                                        <label for="substructure" class="req-label">Substructure</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="superstructure" name="superstructure" placeholder=" " required minlength="2"></textarea>
+                                        <label for="superstructure" class="req-label">Super Structure</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="commissioning" name="commissioning" placeholder=" " required minlength="2"></textarea>
+                                        <label for="commissioning" class="req-label">Commissioning</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="exitsGad" name="exitsGad" required>
+                                            <option value="" disabled selected hidden>Select</option>
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                        <label for="exitsGad" class="req-label">EXITS / GAD</label>
+                                    </div>
+                                    <div class="invalid-feedback">Please select an option.</div>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="designField" name="designField" placeholder=" " required minlength="2">
+                                        <label for="designField" class="req-label">Design</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="exitNo" name="exitNo" placeholder=" " required minlength="1">
+                                        <label for="exitNo" class="req-label">Exit No.</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="noExit" name="noExit" placeholder=" " required minlength="1">
+                                        <label for="noExit" class="req-label">No Exit</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- 05 Design -->
+                        <!-- 06 NOC -->
+                        <div class="rob-panel">
+                            <div class="section-title">
+                                <span class="num">06</span>
+                                <span class="txt">NOC</span>
+                                <span class="sub">Closing &amp; SOA</span>
+                            </div>
+                            <div class="row">
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="nocClosingLc" name="nocClosingLc" placeholder=" " required minlength="2" style="min-height:110px;"></textarea>
+                                        <label for="nocClosingLc" class="req-label">NOC of Closing LC</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="soa" name="soa" placeholder=" " required minlength="2" style="min-height:110px;"></textarea>
+                                        <label for="soa" class="req-label">SOA</label>
+                                    </div>
+                                    <div class="invalid-feedback">This field is required.</div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- 06 NOC -->
+                        <div class="rob-actions">
+                            <button type="submit" class="btn-rob-primary" id="saveBtn">Save Details</button>
+                            <button type="button" id="resetBtn" class="btn-rob-secondary">Reset</button>
+                        </div>
+                        <div class="rob-status" id="formStatus"></div>
+                    </form>
+
+                    <!-- View / Manage records -->
+                    <div class="rob-panel">
+                        <div class="section-title">
+                            <span class="num">07</span>
+                            <span class="txt">Saved LC Records</span>
+                            <span class="sub">View · Edit · Delete</span>
+                        </div>
+
+                        <ul class="nav nav-tabs" id="recordsTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="tab-basic-btn" data-bs-toggle="tab" data-bs-target="#tab-basic" type="button" role="tab">Basic Details</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab-tender-btn" data-bs-toggle="tab" data-bs-target="#tab-tender" type="button" role="tab">Tender Details</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab-land-btn" data-bs-toggle="tab" data-bs-target="#tab-land" type="button" role="tab">Land Acquisition</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab-utility-btn" data-bs-toggle="tab" data-bs-target="#tab-utility" type="button" role="tab">Utility Shifting</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab-design-btn" data-bs-toggle="tab" data-bs-target="#tab-design" type="button" role="tab">Design</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab-noc-btn" data-bs-toggle="tab" data-bs-target="#tab-noc" type="button" role="tab">NOC</button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content border border-top-0 p-3" id="recordsTabsContent">
+
+                            <!-- Basic Details -->
+                            <div class="tab-pane fade show active" id="tab-basic" role="tabpanel">
+                                <div id="body-basic"><p class="text-center text-muted">Loading...</p></div>
+                            </div>
+
+                            <!-- Tender Details -->
+                            <div class="tab-pane fade" id="tab-tender" role="tabpanel">
+                                <div id="body-tender"><p class="text-center text-muted">Loading...</p></div>
+                            </div>
+
+                            <!-- Land Acquisition -->
+                            <div class="tab-pane fade" id="tab-land" role="tabpanel">
+                                <div id="body-land"><p class="text-center text-muted">Loading...</p></div>
+                            </div>
+
+                            <!-- Utility Shifting -->
+                            <div class="tab-pane fade" id="tab-utility" role="tabpanel">
+                                <div id="body-utility"><p class="text-center text-muted">Loading...</p></div>
+                            </div>
+
+                            <!-- Design -->
+                            <div class="tab-pane fade" id="tab-design" role="tabpanel">
+                                <div id="body-design"><p class="text-center text-muted">Loading...</p></div>
+                            </div>
+
+                            <!-- NOC -->
+                            <div class="tab-pane fade" id="tab-noc" role="tabpanel">
+                                <div id="body-noc"><p class="text-center text-muted">Loading...</p></div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function() {
+            const form = document.getElementById('robForm');
+            const status = document.getElementById('formStatus');
+            const resetBtn = document.getElementById('resetBtn');
+            const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            const tabBodies = {
+                basic: document.getElementById('body-basic'),
+                tender: document.getElementById('body-tender'),
+                land: document.getElementById('body-land'),
+                utility: document.getElementById('body-utility'),
+                design: document.getElementById('body-design'),
+                noc: document.getElementById('body-noc')
+            };
+
+            function esc(v) {
+                return (v ?? '').toString().replace(/[&<>"']/g, c => ({
+                    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                }[c]));
+            }
+
+            function actionsCell(id) {
+                return `<td>
+                                    <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${id}">Edit</button>
+                                    <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${id}">Delete</button>
+                                </td>`;
+            }
+
+            function yn(v) { return v === 'Y' ? 'Yes' : (v === 'N' ? 'No' : ''); }
+            function dt(v) { return v ? new Date(v).toLocaleDateString() : ''; }
+
+            function setStatus(message, isError) {
+                status.textContent = message;
+                status.className = 'rob-status ' + (isError ? 'text-danger' : 'text-success');
+            }
+
+            function collectFormData() {
+                const data = {};
+                new FormData(form).forEach((value, key) => { data[key] = value; });
+                // normalize numeric-ish empty strings to null so the API doesn't choke on ""
+                ['yearSanction', 'skewAngle', 'distanceLc', 'sanctionedCont', 'sanctionedDe', 'id'].forEach(k => {
+                    if (data[k] === '') data[k] = null;
+                });
+                return data;
+            }
+
+            function populateForm(record) {
+                document.getElementById('recordId').value = record.id || 0;
+                form.querySelector('#division').value = record.division || '';
+                form.querySelector('#yearSanction').value = record.yearOfSanction || '';
+                form.querySelector('#lcNo').value = record.lcNo || '';
+                form.querySelector('#locationKm').value = record.locationKm || '';
+                form.querySelector('#section').value = record.sectionName || '';
+                form.querySelector('#spanArrangement').value = record.spanArrangement || '';
+                form.querySelector('#skewAngle').value = record.skewAngle || '';
+                form.querySelector('#distanceLc').value = record.distanceExistingLc || '';
+                form.querySelector('#stateApproval').value = record.stateAuthorityApproval || '';
+                form.querySelector('#dprConsultancy').value = record.dprConsultancy || '';
+                form.querySelector('#executiveAgency').value = record.executiveAgency || '';
+                form.querySelector('#gad').value = record.gad === 'Y' ? 'Yes' : (record.gad === 'N' ? 'No' : '');
+                form.querySelector('#checkedReceived').value = record.checkedReceived === 'Y' ? 'Yes' : (record.checkedReceived === 'N' ? 'No' : '');
+                form.querySelector('#sanctionedCont').value = record.sanctionedCont || '';
+                form.querySelector('#sanctionedDe').value = record.sanctionedDe || '';
+                form.querySelector('#tenderStatus').value = record.tenderStatus || '';
+                form.querySelector('#sec7a').value = record.lc7a37a || '';
+                form.querySelector('#sec20aGazette').value = record.gazette20A || '';
+                form.querySelector('#sec20aPaper').value = record.paper20A || '';
+                form.querySelector('#sec20b').value = record.form20B || '';
+                form.querySelector('#sec20c').value = record.form20C || '';
+                form.querySelector('#sec20d').value = record.form20D || '';
+                form.querySelector('#sec20eGazette').value = record.gazette20E || '';
+                form.querySelector('#sec20ePaper').value = record.paper20E || '';
+                form.querySelector('#sec20f').value = record.form20F || '';
+                form.querySelector('#landRemark').value = record.remark || '';
+                form.querySelector('#utilSnt').value = record.stStatus || '';
+                form.querySelector('#utilTrd').value = record.trdStatus || '';
+                form.querySelector('#utilElectrical').value = record.electricalG || '';
+                form.querySelector('#substructure').value = record.substructureStatus || '';
+                form.querySelector('#superstructure').value = record.superStructureStatus || '';
+                form.querySelector('#commissioning').value = record.commissioningStatus || '';
+                form.querySelector('#exitsGad').value = record.gadExit === 'Y' ? 'Yes' : (record.gadExit === 'N' ? 'No' : '');
+                form.querySelector('#designField').value = record.design || '';
+                form.querySelector('#exitNo').value = record.exitNo || '';
+                form.querySelector('#noExit').value = record.noExit || '';
+                form.querySelector('#nocClosingLc').value = record.nocClosingLc || '';
+                form.querySelector('#soa').value = record.soa || '';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Column definitions per tab: key = field on the record, label = header text.
+            // 'division' itself is left out of each table body since it's now the grouping/heading.
+            const tabColumns = {
+                basic: [
+                    { key: 'id', label: 'ID' }, { key: 'yearOfSanction', label: 'Year' },
+                    { key: 'lcNo', label: 'LC No.' }, { key: 'locationKm', label: 'Location Km' },
+                    { key: 'sectionName', label: 'Section' }, { key: 'spanArrangement', label: 'Span Arrangement' },
+                    { key: 'skewAngle', label: 'Skew Angle' }, { key: 'distanceExistingLc', label: 'Distance from Existing LC' },
+                    { key: 'stateAuthorityApproval', label: 'State Authority Approval' },
+                    { key: 'dprConsultancy', label: 'DPR Consultancy' }, { key: 'executiveAgency', label: 'Executive Agency' }
+                ],
+                tender: [
+                    { key: 'id', label: 'ID' }, { key: 'lcNo', label: 'LC No.' },
+                    { key: 'gad', label: 'GAD', fmt: yn }, { key: 'checkedReceived', label: 'Checked & Received', fmt: yn },
+                    { key: 'sanctionedCont', label: 'Sanctioned Cont (Cr)' }, { key: 'sanctionedDe', label: 'Sanctioned DE (Cr)' },
+                    { key: 'tenderStatus', label: 'Status of Tender' }
+                ],
+                land: [
+                    { key: 'id', label: 'ID' }, { key: 'lcNo', label: 'LC No.' },
+                    { key: 'lc7a37a', label: '7A/37A', fmt: dt }, { key: 'gazette20A', label: '20A Gazette', fmt: dt },
+                    { key: 'paper20A', label: '20A Paper', fmt: dt }, { key: 'form20B', label: '20B', fmt: dt },
+                    { key: 'form20C', label: '20C', fmt: dt }, { key: 'form20D', label: '20D', fmt: dt },
+                    { key: 'gazette20E', label: '20E Gazette', fmt: dt }, { key: 'paper20E', label: '20E Paper', fmt: dt },
+                    { key: 'form20F', label: '20F', fmt: dt }, { key: 'remark', label: 'Remark' }
+                ],
+                utility: [
+                    { key: 'id', label: 'ID' }, { key: 'lcNo', label: 'LC No.' },
+                    { key: 'stStatus', label: 'S & T' }, { key: 'trdStatus', label: 'TRD' }, { key: 'electricalG', label: 'Electrical (G)' }
+                ],
+                design: [
+                    { key: 'id', label: 'ID' }, { key: 'lcNo', label: 'LC No.' },
+                    { key: 'substructureStatus', label: 'Substructure' }, { key: 'superStructureStatus', label: 'Super Structure' },
+                    { key: 'commissioningStatus', label: 'Commissioning' }, { key: 'gadExit', label: 'Exits/GAD', fmt: yn },
+                    { key: 'design', label: 'Design' }, { key: 'exitNo', label: 'Exit No.' }, { key: 'noExit', label: 'No Exit' }
+                ],
+                noc: [
+                    { key: 'id', label: 'ID' }, { key: 'lcNo', label: 'LC No.' },
+                    { key: 'nocClosingLc', label: 'NOC of Closing LC' }, { key: 'soa', label: 'SOA' }
+                ]
+            };
+
+            function groupByDivision(data) {
+                const groups = {};
+                data.forEach(r => {
+                    const key = (r.division && r.division.trim()) ? r.division.trim() : 'Unspecified Division';
+                    (groups[key] = groups[key] || []).push(r);
+                });
+                // Alphabetical by division name, case-insensitive
+                return Object.keys(groups).sort((a, b) => a.localeCompare(b)).map(name => ({ name, rows: groups[name] }));
+            }
+
+            function buildDivisionTable(divisionName, rows, columns) {
+                const headerCells = columns.map(c => `<th>${esc(c.label)}</th>`).join('') + '<th style="width:130px;">Actions</th>';
+                const bodyRows = rows.map(r => {
+                    const cells = columns.map(c => `<td>${esc(c.fmt ? c.fmt(r[c.key]) : r[c.key])}</td>`).join('');
+                    return `<tr>${cells}${actionsCell(r.id)}</tr>`;
+                }).join('');
+
+                return `
+                            <div class="mb-4">
+                                <h6 class="fw-bold mb-2">${esc(divisionName)} <span class="text-muted fw-normal">(${rows.length} record${rows.length === 1 ? '' : 's'})</span></h6>
+                                <div class="table-responsive">
+
+        <ul class="nav nav-tabs mb-3" id="statusTabs" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#sanctionTab" type="button">Sanction</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#unsanctionTab" type="button">UnSanction</button></li>
+        </ul>
+        <div class="tab-content">
+        <div class="tab-pane fade show active" id="sanctionTab">
+        <table class="table table-bordered table-hover align-middle table-sm">
+                                        <thead><tr>${headerCells}</tr></thead>
+                                        <tbody>${bodyRows}</tbody>
+                                    </table>
+        </div>
+        <div class="tab-pane fade" id="unsanctionTab">
+        <table class="table table-bordered table-hover align-middle table-sm">
+                                        <thead><tr>${headerCells}</tr></thead>
+                                        <tbody>${bodyRows}</tbody>
+                                    </table>
+        </div>
+        </div>
+
+                                </div>
+                            </div>`;
+            }
+
+            function renderTabs(data) {
+                if (!data || data.length === 0) {
+                    Object.values(tabBodies).forEach(el => {
+                        el.innerHTML = '<p class="text-center text-muted">No records found.</p>';
+                    });
+                    return;
+                }
+
+                const groups = groupByDivision(data);
+
+                Object.keys(tabColumns).forEach(tabKey => {
+                    const columns = tabColumns[tabKey];
+                    tabBodies[tabKey].innerHTML = groups
+                        .map(g => buildDivisionTable(g.name, g.rows, columns))
+                        .join('');
+                });
+            }
+
+            async function loadRecords() {
+                Object.values(tabBodies).forEach(tb => {
+                    tb.innerHTML = '<p class="text-center text-muted">Loading...</p>';
+                });
+                try {
+                    const res = await fetch('?handler=List', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                    const json = await res.json();
+                    if (!json.success) {
+                        setStatus(json.message || 'Failed to load records.', true);
+                        return;
+                    }
+                    renderTabs(json.data);
+                } catch (err) {
+                    setStatus('Failed to load records: ' + err.message, true);
+                }
+            }
+
+            // Single delegated listener on the shared tab-content wrapper covers all six grids.
+            document.getElementById('recordsTabsContent').addEventListener('click', async (e) => {
+                const id = e.target.getAttribute('data-id');
+                if (!id) return;
+
+                if (e.target.classList.contains('edit-btn')) {
+                    const res = await fetch(`?handler=Item&id=${id}`);
+                    const json = await res.json();
+                    if (json.success) populateForm(json.data);
+                    else setStatus(json.message || 'Could not load record.', true);
+                }
+
+                if (e.target.classList.contains('delete-btn')) {
+                    if (!confirm('Delete this record permanently?')) return;
+                    const res = await fetch(`?handler=Delete&id=${id}`, {
+                        method: 'POST',
+                        headers: { 'RequestVerificationToken': antiForgeryToken }
+                    });
+                    const json = await res.json();
+                    setStatus(json.message, !json.success);
+                    if (json.success) loadRecords();
+                }
+            });
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!form.checkValidity()) {
+                    form.classList.add('was-validated');
+                    return;
+                }
+
+                const payload = collectFormData();
+                try {
+                    const res = await fetch('?handler=Save', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': antiForgeryToken
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    const json = await res.json();
+                    setStatus(json.message, !json.success);
+                    if (json.success) {
+                        form.reset();
+                        form.classList.remove('was-validated');
+                        document.getElementById('recordId').value = 0;
+                        loadRecords();
+                    }
+                } catch (err) {
+                    setStatus('Save failed: ' + err.message, true);
+                }
+            });
+
+            resetBtn.addEventListener('click', () => {
+                form.reset();
+                form.classList.remove('was-validated');
+                document.getElementById('recordId').value = 0;
+                setStatus('', false);
+            });
+
+            loadRecords();
+        })();
+    </script>
+}

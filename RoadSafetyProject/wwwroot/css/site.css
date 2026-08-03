@@ -1,0 +1,58 @@
+html {
+    font-size: 14px;
+    height: 100%;
+}
+
+@media (min-width:768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 .1rem #fff, 0 0 0 .25rem #258cfb;
+}
+
+/* Sticky Footer */
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+.content-wrapper {
+    flex: 1;
+}
+
+/* Footer */
+
+.footer {
+    background: #14315c;
+    color: #fff;
+    font-size: 1rem;
+    padding: 15px 0;
+    text-align: center;
+    margin-top: auto;
+    width: 100%;
+    border-top: none;
+}
+
+/* Floating Label */
+
+.form-floating > .form-control-plaintext::placeholder,
+.form-floating > .form-control::placeholder {
+    color: var(--bs-secondary-color);
+    text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder,
+.form-floating > .form-control:focus::placeholder {
+    text-align: start;
+}
