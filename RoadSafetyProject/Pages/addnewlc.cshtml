@@ -6,7 +6,7 @@
 @Html.AntiForgeryToken()
 <div class="content-wrapper">
     <!-- Summary Cards -->
-    <div class="container mb-4">
+    <div class="container-fluid mb-4">
         <div class="col-md-12">
             <div class="form-card">
                 <div class="rob-sheet">
@@ -514,6 +514,9 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script>
         (function() {
             const form = document.getElementById('robForm');
@@ -529,6 +532,117 @@
                 design: document.getElementById('body-design'),
                 noc: document.getElementById('body-noc')
             };
+
+            // Friendly labels for the six category tabs, used in export titles/filenames.
+            const tabTitles = {
+                basic: 'Basic Details',
+                tender: 'Tender Details',
+                land: 'Land Acquisition',
+                utility: 'Utility Shifting',
+                design: 'Design',
+                noc: 'NOC'
+            };
+
+            function sanitizeFilename(s) {
+                return (s || 'export').toString().replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '') || 'export';
+            }
+
+            // Reads header/body text out of a rendered table, dropping the trailing Actions column.
+            function getTableData(tableEl) {
+                const headerCells = Array.from(tableEl.querySelectorAll('thead th'));
+                const actionColIndex = headerCells.length - 1;
+                const headers = headerCells.slice(0, actionColIndex).map(th => th.textContent.trim());
+                const rows = Array.from(tableEl.querySelectorAll('tbody tr')).map(tr =>
+                    Array.from(tr.children).slice(0, actionColIndex).map(td => td.textContent.trim())
+                );
+                return { headers, rows };
+            }
+
+            function exportTableToExcel(tableId, filename) {
+                const tableEl = document.getElementById(tableId);
+                if (!tableEl || typeof XLSX === 'undefined') return;
+                const { headers, rows } = getTableData(tableEl);
+                const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Records');
+                XLSX.writeFile(wb, `${sanitizeFilename(filename)}.xlsx`);
+            }
+
+            function exportTableToPdf(tableId, title, filename) {
+                const tableEl = document.getElementById(tableId);
+                if (!tableEl || typeof jspdf === 'undefined') return;
+                const { headers, rows } = getTableData(tableEl);
+                const { jsPDF } = jspdf;
+                const doc = new jsPDF({ orientation: 'landscape' });
+                doc.setFontSize(12);
+                doc.text(title, 14, 12);
+                doc.autoTable({
+                    head: [headers],
+                    body: rows,
+                    startY: 18,
+                    styles: { fontSize: 7, cellPadding: 2 },
+                    headStyles: { fillColor: [30, 60, 114] }
+                });
+                doc.save(`${sanitizeFilename(filename)}.pdf`);
+            }
+
+            function printTable(tableId, title) {
+
+                const tableEl = document.getElementById(tableId);
+
+                if (!tableEl) return;
+
+                const clone = tableEl.cloneNode(true);
+
+                const actionColIndex = clone.querySelectorAll("thead th").length - 1;
+
+                clone.querySelectorAll("tr").forEach(tr => {
+
+                    if (tr.children[actionColIndex])
+
+                        tr.children[actionColIndex].remove();
+
+                });
+
+                const win = window.open("", "_blank");
+
+                if (!win) return;
+
+                // IMPORTANT: build the closing body/html tag text via concatenation, never as a
+                // literal string. ASP.NET Core's dev-time hot-reload middleware scans the rendered
+                // response for that literal closing-body tag text and injects a real script
+                // reference right there. If that exact text appears anywhere in our own source
+                // (including inside a template literal like this one), it gets matched and a real
+                // script tag gets injected mid-string — which ends this page's own script block
+                // early and dumps the rest of this file's JS as visible text on the page. This is
+                // exactly what was happening here before; do not put the literal closing tags back.
+                const CLOSE_BODY = '</' + 'body>';
+                const CLOSE_HTML = '</' + 'html>';
+
+                const popupHtml = '<!DOCTYPE html>' +
+                    '<html><head><title>' + esc(title) + '</title>' +
+                    '<style>' +
+                    'body{font-family:Arial;padding:20px;}' +
+                    'table{width:100%;border-collapse:collapse;}' +
+                    'th,td{border:1px solid #999;padding:6px;font-size:12px;}' +
+                    'th{background:#f5f5f5;}' +
+                    '</style>' +
+                    '</head><body>' +
+                    '<h3>' + esc(title) + '</h3>' +
+                    clone.outerHTML +
+                    CLOSE_BODY + CLOSE_HTML;
+
+                win.document.open();
+                win.document.write(popupHtml);
+                win.document.close();
+
+                setTimeout(function () {
+
+                    win.print();
+
+                },300);
+
+            }
 
             function esc(v) {
                 return (v ?? '').toString().replace(/[&<>"']/g, c => ({
@@ -563,6 +677,9 @@
 
             function populateForm(record) {
                 document.getElementById('recordId').value = record.id || 0;
+                const isUnSanction = (record.lcStatus || '').toString().trim().toLowerCase() === 'unsanction';
+                document.getElementById('statusSanction').checked = !isUnSanction;
+                document.getElementById('statusUnSanction').checked = isUnSanction;
                 form.querySelector('#division').value = record.division || '';
                 form.querySelector('#yearSanction').value = record.yearOfSanction || '';
                 form.querySelector('#lcNo').value = record.lcNo || '';
@@ -655,33 +772,73 @@
                 return Object.keys(groups).sort((a, b) => a.localeCompare(b)).map(name => ({ name, rows: groups[name] }));
             }
 
-            function buildDivisionTable(divisionName, rows, columns) {
-                const headerCells = columns.map(c => `<th>${esc(c.label)}</th>`).join('') + '<th style="width:130px;">Actions</th>';
-                const bodyRows = rows.map(r => {
+            // A record counts as "UnSanction" only if lcStatus explicitly says so;
+            // anything missing/blank/other is treated as "Sanction" (matches the form default).
+            function isUnSanctionRow(r) {
+                return (r.lcStatus || '').toString().trim().toLowerCase() === 'unsanction';
+            }
+
+            function buildRowsHtml(rows, columns) {
+                if (!rows.length) {
+                    return `<tr><td colspan="${columns.length + 1}" class="text-center text-muted">No records.</td></tr>`;
+                }
+                return rows.map(r => {
                     const cells = columns.map(c => `<td>${esc(c.fmt ? c.fmt(r[c.key]) : r[c.key])}</td>`).join('');
                     return `<tr>${cells}${actionsCell(r.id)}</tr>`;
                 }).join('');
+            }
+
+            // uid must be unique per division+tab combination so nav/pane ids never collide
+            // across the multiple division blocks and multiple category tabs rendered on the page.
+            function buildDivisionTable(divisionName, rows, columns, uid, tabLabel) {
+                const headerCells = columns.map(c => `<th>${esc(c.label)}</th>`).join('') + '<th style="width:130px;">Actions</th>';
+
+                const sanctionRows = rows.filter(r => !isUnSanctionRow(r));
+                const unsanctionRows = rows.filter(isUnSanctionRow);
+
+                const sanctionTabId = `sanctionTab-${uid}`;
+                const unsanctionTabId = `unsanctionTab-${uid}`;
+                const navId = `statusTabs-${uid}`;
+                const sanctionTableId = `tbl-${sanctionTabId}`;
+                const unsanctionTableId = `tbl-${unsanctionTabId}`;
+
+                const sanctionTitle = `${divisionName} - ${tabLabel} (Sanction)`;
+                const unsanctionTitle = `${divisionName} - ${tabLabel} (UnSanction)`;
+                const sanctionFile = sanitizeFilename(`${divisionName}_${tabLabel}_Sanction`);
+                const unsanctionFile = sanitizeFilename(`${divisionName}_${tabLabel}_UnSanction`);
+
+                const toolbar = (tableId, title, filename) => `
+                    <div class="d-flex justify-content-end gap-2 mb-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary export-print-btn"
+                                data-table-id="${tableId}" data-title="${esc(title)}">Print</button>
+                        <button type="button" class="btn btn-sm btn-outline-success export-excel-btn"
+                                data-table-id="${tableId}" data-filename="${esc(filename)}">Excel</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger export-pdf-btn"
+                                data-table-id="${tableId}" data-title="${esc(title)}" data-filename="${esc(filename)}">PDF</button>
+                    </div>`;
 
                 return `
                             <div class="mb-4">
                                 <h6 class="fw-bold mb-2">${esc(divisionName)} <span class="text-muted fw-normal">(${rows.length} record${rows.length === 1 ? '' : 's'})</span></h6>
                                 <div class="table-responsive">
 
-        <ul class="nav nav-tabs mb-3" id="statusTabs" role="tablist">
-        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#sanctionTab" type="button">Sanction</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#unsanctionTab" type="button">UnSanction</button></li>
+        <ul class="nav nav-tabs mb-3" id="${navId}" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#${sanctionTabId}" type="button">Sanction (${sanctionRows.length})</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#${unsanctionTabId}" type="button">UnSanction (${unsanctionRows.length})</button></li>
         </ul>
         <div class="tab-content">
-        <div class="tab-pane fade show active" id="sanctionTab">
-        <table class="table table-bordered table-hover align-middle table-sm">
+        <div class="tab-pane fade show active" id="${sanctionTabId}">
+        ${toolbar(sanctionTableId, sanctionTitle, sanctionFile)}
+        <table id="${sanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
                                         <thead><tr>${headerCells}</tr></thead>
-                                        <tbody>${bodyRows}</tbody>
+                                        <tbody>${buildRowsHtml(sanctionRows, columns)}</tbody>
                                     </table>
         </div>
-        <div class="tab-pane fade" id="unsanctionTab">
-        <table class="table table-bordered table-hover align-middle table-sm">
+        <div class="tab-pane fade" id="${unsanctionTabId}">
+        ${toolbar(unsanctionTableId, unsanctionTitle, unsanctionFile)}
+        <table id="${unsanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
                                         <thead><tr>${headerCells}</tr></thead>
-                                        <tbody>${bodyRows}</tbody>
+                                        <tbody>${buildRowsHtml(unsanctionRows, columns)}</tbody>
                                     </table>
         </div>
         </div>
@@ -703,7 +860,7 @@
                 Object.keys(tabColumns).forEach(tabKey => {
                     const columns = tabColumns[tabKey];
                     tabBodies[tabKey].innerHTML = groups
-                        .map(g => buildDivisionTable(g.name, g.rows, columns))
+                        .map((g, idx) => buildDivisionTable(g.name, g.rows, columns, `${tabKey}-${idx}`, tabTitles[tabKey] || tabKey))
                         .join('');
                 });
             }
@@ -726,28 +883,137 @@
             }
 
             // Single delegated listener on the shared tab-content wrapper covers all six grids.
-            document.getElementById('recordsTabsContent').addEventListener('click', async (e) => {
-                const id = e.target.getAttribute('data-id');
-                if (!id) return;
+            // Handle Export / Edit / Delete buttons
+            const recordsTabs = document.getElementById("recordsTabsContent");
 
-                if (e.target.classList.contains('edit-btn')) {
-                    const res = await fetch(`?handler=Item&id=${id}`);
-                    const json = await res.json();
-                    if (json.success) populateForm(json.data);
-                    else setStatus(json.message || 'Could not load record.', true);
-                }
+            if (recordsTabs) {
 
-                if (e.target.classList.contains('delete-btn')) {
-                    if (!confirm('Delete this record permanently?')) return;
-                    const res = await fetch(`?handler=Delete&id=${id}`, {
-                        method: 'POST',
-                        headers: { 'RequestVerificationToken': antiForgeryToken }
-                    });
-                    const json = await res.json();
-                    setStatus(json.message, !json.success);
-                    if (json.success) loadRecords();
-                }
-            });
+                recordsTabs.addEventListener("click", async function (e) {
+
+                    // -------------------------
+                    // Export Buttons
+                    // -------------------------
+                    const exportBtn = e.target.closest(
+                        ".export-print-btn, .export-excel-btn, .export-pdf-btn"
+                    );
+
+                    if (exportBtn) {
+
+                        const tableId = exportBtn.getAttribute("data-table-id");
+                        const title = exportBtn.getAttribute("data-title") || "Records";
+                        const filename = exportBtn.getAttribute("data-filename") || "records";
+
+                        if (exportBtn.classList.contains("export-print-btn")) {
+
+                            printTable(tableId, title);
+
+                        }
+                        else if (exportBtn.classList.contains("export-excel-btn")) {
+
+                            exportTableToExcel(tableId, filename);
+
+                        }
+                        else if (exportBtn.classList.contains("export-pdf-btn")) {
+
+                            exportTableToPdf(tableId, title, filename);
+
+                        }
+
+                        return;
+                    }
+
+                    // -------------------------
+                    // Edit/Delete Buttons
+                    // -------------------------
+                    const btn = e.target.closest(".edit-btn, .delete-btn");
+
+                    if (!btn)
+                        return;
+
+                    const id = btn.getAttribute("data-id");
+
+                    if (!id)
+                        return;
+
+                    // -------------------------
+                    // Edit
+                    // -------------------------
+                    if (btn.classList.contains("edit-btn")) {
+
+                        try {
+
+                            const response = await fetch(`?handler=Item&id=${id}`);
+
+                            if (!response.ok)
+                                throw new Error("Unable to load record.");
+
+                            const json = await response.json();
+
+                            if (json.success) {
+
+                                populateForm(json.data);
+
+                            }
+                            else {
+
+                                setStatus(json.message || "Record not found.", true);
+
+                            }
+
+                        }
+                        catch (err) {
+
+                            setStatus(err.message, true);
+
+                        }
+
+                        return;
+                    }
+
+                    // -------------------------
+                    // Delete
+                    // -------------------------
+                    if (btn.classList.contains("delete-btn")) {
+
+                        if (!confirm("Delete this record permanently?"))
+                            return;
+
+                        try {
+
+                            const response = await fetch(`?handler=Delete&id=${id}`, {
+
+                                method: "POST",
+
+                                headers: {
+                                    "RequestVerificationToken": antiForgeryToken
+                                }
+
+                            });
+
+                            if (!response.ok)
+                                throw new Error("Delete failed.");
+
+                            const json = await response.json();
+
+                            setStatus(json.message, !json.success);
+
+                            if (json.success) {
+
+                                await loadRecords();
+
+                            }
+
+                        }
+                        catch (err) {
+
+                            setStatus(err.message, true);
+
+                        }
+                    }
+
+                });
+
+            }
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();

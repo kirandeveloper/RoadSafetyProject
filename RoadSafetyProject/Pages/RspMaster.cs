@@ -16,7 +16,7 @@ namespace RoadSafetyProject.Models
         public string LcNo { get; set; }                  // LC_NO
         public string LocationKm { get; set; }             // LOCATION_KM
         public string Division { get; set; }               // DIVISION
-        public string LC_STATUS { get; set; }
+        public string LcStatus { get; set; }                // LC_STATUS ('Sanction'/'UnSanction')
 
         public string SectionName { get; set; }            // SECTION_NAME
         public string SpanArrangement { get; set; }        // SPAN_ARRANGEMENT

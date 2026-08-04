@@ -550,71 +550,55 @@ function downloadExcel(btn) {
 }
 
 
-function printTable(btn) {
 
-    const tableId = btn.dataset.table;
-    const title = btn.dataset.title;
+function printTable(tableId, title) {
 
     const table = document.getElementById(tableId);
 
-    if (!table) {
-        alert('Table not found');
+    if (!table)
         return;
-    }
 
-    const win =
-        window.open('', '', 'width=1400,height=900');
+    const popup = window.open("", "_blank", "width=1200,height=700");
 
-    win.document.write(`
-        <html>
-        <head>
-            <title>${title}</title>
+    if (!popup)
+        return;
 
-            <style>
-                body{
-                    font-family:Arial,sans-serif;
-                    padding:20px;
-                }
+    popup.document.open();
 
-                h2{
-                    text-align:center;
-                    margin-bottom:20px;
-                }
+    popup.document.write("<!DOCTYPE html>");
+    popup.document.write("<html>");
+    popup.document.write("<head>");
+    popup.document.write("<title>" + title + "</title>");
 
-                table{
-                    width:100%;
-                    border-collapse:collapse;
-                }
+    popup.document.write("<style>");
+    popup.document.write("body{font-family:Arial;padding:20px;}");
+    popup.document.write("table{width:100%;border-collapse:collapse;}");
+    popup.document.write("th,td{border:1px solid #999;padding:6px;}");
+    popup.document.write("th{background:#f5f5f5;}");
+    popup.document.write("</style>");
 
-                th,td{
-                    border:1px solid #000;
-                    padding:8px;
-                }
+    popup.document.write("</head>");
+    popup.document.write("<body>");
 
-                th{
-                    background:#f2f2f2;
-                }
-            </style>
+    popup.document.write("<h3>" + title + "</h3>");
 
-        </head>
+    popup.document.write(table.outerHTML);
 
-        <body>
+    popup.document.write("</body>");
+    popup.document.write("</html>");
 
-            <h2>${title}</h2>
+    popup.document.close();
 
-            ${table.outerHTML}
+    popup.focus();
 
-        </body>
-        </html>
-    `);
+    setTimeout(function () {
 
-    win.document.close();
+        popup.print();
 
-    setTimeout(() => {
-        win.print();
-        win.close();
-    }, 500);
+    }, 300);
+
 }
+
 
 /* download table generic */
 
@@ -753,6 +737,40 @@ document.querySelectorAll(".node").forEach(node=>{
 
 const viewer = document.getElementById("viewer");
 const viewerImg = document.getElementById("viewerImg");
+
+let zoom = 1;
+
+// Only attach events if both elements exist
+if (viewer && viewerImg) {
+
+    viewerImg.addEventListener("click", function (e) {
+        e.stopPropagation();
+    });
+
+    viewerImg.addEventListener("wheel", function (e) {
+
+        e.preventDefault();
+
+        if (e.deltaY < 0)
+            zoom += 0.1;
+        else
+            zoom -= 0.1;
+
+        zoom = Math.max(1, Math.min(zoom, 5));
+
+        viewerImg.style.transform = "scale(" + zoom + ")";
+    });
+
+    viewer.addEventListener("click", function () {
+
+        zoom = 1;
+
+        viewerImg.style.transform = "scale(1)";
+
+        viewer.style.display = "none";
+    });
+
+}
 
 let currentImage = "";
 

@@ -32,7 +32,7 @@ namespace RoadSafetyProject.Data
         {
             const string sql = @"
                 INSERT INTO RSP_MASTER
-                (ID, SR_NO, YEAR_OF_SANCTION, LC_NO, LOCATION_KM, DIVISION, SECTION_NAME,
+                (ID, SR_NO, YEAR_OF_SANCTION, LC_NO, LOCATION_KM, DIVISION, LC_STATUS, SECTION_NAME,
                  SPAN_ARRANGEMENT, SKEW_ANGLE, DISTANCE_EXISTING_LC, STATE_AUTHORITY_APPROVAL,
                  DPR_CONSULTANCY, EXECUTIVE_AGENCY, GAD, CHECKED_RECEIVED, SANCTIONED_CONT,
                  SANCTIONED_DE, TENDER_STATUS, LC_7A_37A, GAZETTE_20A, PAPER_20A, FORM_20B,
@@ -41,7 +41,7 @@ namespace RoadSafetyProject.Data
                  COMMISSIONING_STATUS, GAD_EXIT, DESIGN_STATUS, EXIT_NO, NO_EXIT, DESIGN,
                  NOC_CLOSING_LC, SOA)
                 VALUES
-                (RSP_MASTER_SEQ.NEXTVAL, :srNo, :yearOfSanction, :lcNo, :locationKm, :division, :sectionName,
+                (RSP_MASTER_SEQ.NEXTVAL, :srNo, :yearOfSanction, :lcNo, :locationKm, :division, :lcStatus, :sectionName,
                  :spanArrangement, :skewAngle, :distanceExistingLc, :stateAuthorityApproval,
                  :dprConsultancy, :executiveAgency, :gad, :checkedReceived, :sanctionedCont,
                  :sanctionedDe, :tenderStatus, :lc7a37a, :gazette20A, :paper20A, :form20B,
@@ -98,6 +98,7 @@ namespace RoadSafetyProject.Data
                     LC_NO = :lcNo,
                     LOCATION_KM = :locationKm,
                     DIVISION = :division,
+                    LC_STATUS = :lcStatus,
                     SECTION_NAME = :sectionName,
                     SPAN_ARRANGEMENT = :spanArrangement,
                     SKEW_ANGLE = :skewAngle,
@@ -201,6 +202,7 @@ namespace RoadSafetyProject.Data
             cmd.Parameters.Add(new OracleParameter("lcNo", OracleDbType.Varchar2) { Value = (object)m.LcNo ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("locationKm", OracleDbType.Varchar2) { Value = (object)m.LocationKm ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("division", OracleDbType.Varchar2) { Value = (object)m.Division ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("lcStatus", OracleDbType.Varchar2) { Value = (object)m.LcStatus ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("sectionName", OracleDbType.Varchar2) { Value = (object)m.SectionName ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("spanArrangement", OracleDbType.Varchar2) { Value = (object)m.SpanArrangement ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("skewAngle", OracleDbType.Decimal) { Value = (object)m.SkewAngle ?? DBNull.Value });
@@ -254,6 +256,7 @@ namespace RoadSafetyProject.Data
                 LcNo = GetString(r, "LC_NO"),
                 LocationKm = GetString(r, "LOCATION_KM"),
                 Division = GetString(r, "DIVISION"),
+                LcStatus = GetString(r, "LC_STATUS"),
                 SectionName = GetString(r, "SECTION_NAME"),
                 SpanArrangement = GetString(r, "SPAN_ARRANGEMENT"),
                 SkewAngle = GetDecimal(r, "SKEW_ANGLE"),
@@ -315,5 +318,40 @@ namespace RoadSafetyProject.Data
             int i = r.GetOrdinal(col);
             return r.IsDBNull(i) ? (DateTime?)null : r.GetDateTime(i);
         }
+
+        public List<DivisionCount> GetDivisionCounts()
+        {
+            const string sql = @"
+            SELECT
+            DIVISION,
+            LC_STATUS,
+            COUNT(*) TOTAL
+            FROM RSP_MASTER
+            GROUP BY DIVISION, LC_STATUS
+            ORDER BY DIVISION";
+
+            var list = new List<DivisionCount>();
+
+            using var conn = GetConnection();
+            conn.Open();
+
+            using var cmd = new OracleCommand(sql, conn);
+
+            using var reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                list.Add(new DivisionCount
+                {
+                    Division = reader["DIVISION"].ToString(),
+                    LC_STATUS = reader["LC_STATUS"].ToString(),
+                    Total = Convert.ToInt32(reader["TOTAL"])
+                });
+            }
+
+            return list;
+        }
+
+
     }
 }

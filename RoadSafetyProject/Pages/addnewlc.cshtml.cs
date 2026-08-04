@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
 using RoadSafetyProject.Data;
 using RoadSafetyProject.Models;
+using System.Linq;
 
 namespace RoadSafetyProject.Pages
 {
@@ -29,10 +30,29 @@ namespace RoadSafetyProject.Pages
         }
 
         // GET ?handler=List  -> table data for the "view" grid
-        public JsonResult OnGetList()
+        public JsonResult OnGetList(string division = "", string status = "")
         {
             var items = _repo.GetAll();
-            return new JsonResult(new { success = true, data = items });
+
+            if (!string.IsNullOrWhiteSpace(division))
+            {
+                items = items
+                    .Where(x => x.Division == division)
+                    .ToList();
+            }
+
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                items = items
+                    .Where(x => x.LcStatus == status)
+                    .ToList();
+            }
+
+            return new JsonResult(new
+            {
+                success = true,
+                data = items
+            });
         }
 
         // GET ?handler=Item&id=5  -> single record, used to populate the form for Edit
@@ -78,6 +98,14 @@ namespace RoadSafetyProject.Pages
                 return new JsonResult(new { success = false, message = "Delete failed: " + ex.Message }) { StatusCode = 500 };
             }
         }
+
+        public JsonResult OnGetDivisionCounts()
+        {
+            var data = _repo.GetDivisionCounts();
+
+            return new JsonResult(data);
+        }
+
     }
 
     /// <summary>
@@ -89,6 +117,7 @@ namespace RoadSafetyProject.Pages
     public class RspMasterDto
     {
         public int id { get; set; }
+        public string lcStatus { get; set; }
         public int? srNo { get; set; }
         public int? yearSanction { get; set; }
         public string lcNo { get; set; }
@@ -134,6 +163,7 @@ namespace RoadSafetyProject.Pages
             return new RspMaster
             {
                 Id = id,
+                LcStatus = string.IsNullOrWhiteSpace(lcStatus) ? "Sanction" : lcStatus,
                 SrNo = srNo,
                 YearOfSanction = yearSanction,
                 LcNo = lcNo,
