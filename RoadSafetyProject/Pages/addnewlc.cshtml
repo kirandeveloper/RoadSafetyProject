@@ -59,7 +59,7 @@
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <div class="form-floating">
-                                        <input type="number" class="form-control" id="yearSanction" name="yearSanction" placeholder=" " required min="1950" max="2100" step="1" />
+                                        <input type="text" class="form-control" id="yearSanction" name="yearSanction" placeholder=" " required pattern="^(19[5-9]\d|20\d{2}|2100)$" inputmode="numeric" />
                                         <label for="yearSanction" class="req-label">Year of Sanction</label>
                                     </div>
                                     <div class="invalid-feedback">Enter a valid 4-digit year (1950–2100).</div>
@@ -101,8 +101,8 @@
 
                                 <div class="col-md-4 mb-3">
                                     <div class="form-floating">
-                                        <input type="number" class="form-control" id="skewAngle" name="skewAngle"
-                                               placeholder=" " required min="0" max="90" step="0.1">
+                                        <input type="text" class="form-control" id="skewAngle" name="skewAngle"
+                                               placeholder=" " required pattern="^(90(\.0{1,2})?|[0-8]?\d(\.\d{1,2})?)$" inputmode="decimal">
                                         <label for="skewAngle" class="req-label">Skew Angle (°)</label>
                                     </div>
                                     <div class="invalid-feedback">Skew angle must be between 0° and 90°.</div>
@@ -110,8 +110,8 @@
 
                                 <div class="col-md-4 mb-3">
                                     <div class="form-floating">
-                                        <input type="number" class="form-control" id="distanceLc" name="distanceLc"
-                                               placeholder=" " required min="0" step="1">
+                                        <input type="text" class="form-control" id="distanceLc" name="distanceLc"
+                                               placeholder=" " required pattern="^\d+$" inputmode="numeric">
                                         <label for="distanceLc" class="req-label">Distance from Existing LC (m)</label>
                                     </div>
                                     <div class="invalid-feedback">Enter distance in metres (0 or more).</div>
@@ -157,19 +157,28 @@
 
                                 <div class="col-md-2 mb-3">
                                     <div class="form-floating">
-                                        <select class="form-select" id="gad" name="gad" required>
+                                        <select class="form-select yn-select" id="gad" name="gad" data-remark-for="gad" required>
                                             <option value="" disabled selected hidden>Select</option>
                                             <option value="Yes">Yes</option>
                                             <option value="No">No</option>
                                         </select>
-                                        <label for="gad" class="req-label">GAD</label>
+                                        <label for="gad" class="req-label">
+                                            GAD
+                                        </label>
                                     </div>
                                     <div class="invalid-feedback">Please select an option.</div>
+                                    <div class="mt-2 d-none" id="gadRemarkWrap">
+                                        <div class="form-floating">
+                                            <textarea class="form-control" id="gadRemark" name="gadRemark" placeholder=" "></textarea>
+                                            <label for="gadRemark" class="req-label">GAD Remark</label>
+                                        </div>
+                                        <div class="invalid-feedback">Please give a reason since GAD is No.</div>
+                                    </div>
                                 </div>
 
                                 <div class="col-md-3 mb-3">
                                     <div class="form-floating">
-                                        <select class="form-select" id="checkedReceived" name="checkedReceived" required>
+                                        <select class="form-select yn-select" id="checkedReceived" name="checkedReceived" data-remark-for="checkedReceived" required>
                                             <option value="" disabled selected hidden>Select</option>
                                             <option value="Yes">Yes</option>
                                             <option value="No">No</option>
@@ -177,12 +186,19 @@
                                         <label for="checkedReceived" class="req-label">Checked &amp; Received</label>
                                     </div>
                                     <div class="invalid-feedback">Please select an option.</div>
+                                    <div class="mt-2 d-none" id="checkedReceivedRemarkWrap">
+                                        <div class="form-floating">
+                                            <textarea class="form-control" id="checkedReceivedRemark" name="checkedReceivedRemark" placeholder=" "></textarea>
+                                            <label for="checkedReceivedRemark" class="req-label">Checked &amp; Received Remark</label>
+                                        </div>
+                                        <div class="invalid-feedback">Please give a reason since Checked &amp; Received is No.</div>
+                                    </div>
                                 </div>
 
                                 <div class="col-md-2 mb-3">
                                     <div class="form-floating">
-                                        <input type="number" class="form-control" id="sanctionedCont" name="sanctionedCont"
-                                               placeholder=" " required min="0" step="0.01">
+                                        <input type="text" class="form-control" id="sanctionedCont" name="sanctionedCont"
+                                               placeholder=" " required pattern="^\d+(\.\d{1,2})?$" inputmode="decimal">
                                         <label for="sanctionedCont" class="req-label">Sanctioned Cont (Cr)</label>
                                     </div>
                                     <div class="invalid-feedback">Enter a non-negative amount.</div>
@@ -190,8 +206,8 @@
 
                                 <div class="col-md-2 mb-3">
                                     <div class="form-floating">
-                                        <input type="number" class="form-control" id="sanctionedDe" name="sanctionedDe"
-                                               placeholder=" " required min="0" step="0.01">
+                                        <input type="text" class="form-control" id="sanctionedDe" name="sanctionedDe"
+                                               placeholder=" " required pattern="^\d+(\.\d{1,2})?$" inputmode="decimal">
                                         <label for="sanctionedDe" class="req-label">Sanctioned DE (Cr)</label>
                                     </div>
                                     <div class="invalid-feedback">Enter a non-negative amount.</div>
@@ -372,7 +388,7 @@
 
                                 <div class="col-md-3 mb-3">
                                     <div class="form-floating">
-                                        <select class="form-select" id="exitsGad" name="exitsGad" required>
+                                        <select class="form-select yn-select" id="exitsGad" name="exitsGad" data-remark-for="exitsGad" required>
                                             <option value="" disabled selected hidden>Select</option>
                                             <option value="Yes">Yes</option>
                                             <option value="No">No</option>
@@ -380,6 +396,13 @@
                                         <label for="exitsGad" class="req-label">EXITS / GAD</label>
                                     </div>
                                     <div class="invalid-feedback">Please select an option.</div>
+                                    <div class="mt-2 d-none" id="exitsGadRemarkWrap">
+                                        <div class="form-floating">
+                                            <textarea class="form-control" id="exitsGadRemark" name="exitsGadRemark" placeholder=" "></textarea>
+                                            <label for="exitsGadRemark" class="req-label">EXITS / GAD Remark</label>
+                                        </div>
+                                        <div class="invalid-feedback">Please give a reason since EXITS / GAD is No.</div>
+                                    </div>
                                 </div>
 
                                 <div class="col-md-3 mb-3">
@@ -507,6 +530,7 @@
 
                         </div>
                     </div>
+                    <!-- View / Manage records -->
                 </div>
             </div>
         </div>
@@ -523,6 +547,27 @@
             const status = document.getElementById('formStatus');
             const resetBtn = document.getElementById('resetBtn');
             const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            // Yes/No selects that reveal a "why" remark textarea when the answer is "No".
+            // The textarea is shown/hidden, marked required only while visible, and
+            // cleared when hidden so a stale remark can't get saved for a "Yes" answer.
+            function syncYesNoRemark(fieldId) {
+                const select = document.getElementById(fieldId);
+                const wrap = document.getElementById(fieldId + 'RemarkWrap');
+                const textarea = document.getElementById(fieldId + 'Remark');
+                if (!select || !wrap || !textarea) return;
+
+                const isNo = select.value === 'No';
+                wrap.classList.toggle('d-none', !isNo);
+                textarea.required = isNo;
+                if (!isNo) textarea.value = '';
+            }
+
+            document.querySelectorAll('.yn-select').forEach(select => {
+                const fieldId = select.getAttribute('data-remark-for') || select.id;
+                select.addEventListener('change', () => syncYesNoRemark(fieldId));
+                syncYesNoRemark(fieldId); // initial state on page load
+            });
 
             const tabBodies = {
                 basic: document.getElementById('body-basic'),
@@ -636,11 +681,11 @@
                 win.document.write(popupHtml);
                 win.document.close();
 
-                setTimeout(function () {
+                setTimeout(function() {
 
                     win.print();
 
-                },300);
+                }, 300);
 
             }
 
@@ -652,9 +697,9 @@
 
             function actionsCell(id) {
                 return `<td>
-                                    <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${id}">Edit</button>
-                                    <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${id}">Delete</button>
-                                </td>`;
+                                            <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${id}">Edit</button>
+                                            <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${id}">Delete</button>
+                                        </td>`;
             }
 
             function yn(v) { return v === 'Y' ? 'Yes' : (v === 'N' ? 'No' : ''); }
@@ -691,8 +736,8 @@
                 form.querySelector('#stateApproval').value = record.stateAuthorityApproval || '';
                 form.querySelector('#dprConsultancy').value = record.dprConsultancy || '';
                 form.querySelector('#executiveAgency').value = record.executiveAgency || '';
-                form.querySelector('#gad').value = record.gad === 'Y' ? 'Yes' : (record.gad === 'N' ? 'No' : '');
-                form.querySelector('#checkedReceived').value = record.checkedReceived === 'Y' ? 'Yes' : (record.checkedReceived === 'N' ? 'No' : '');
+                form.querySelector('#gad').value = record.gad || '';
+                form.querySelector('#checkedReceived').value = record.checkedReceived || '';
                 form.querySelector('#sanctionedCont').value = record.sanctionedCont || '';
                 form.querySelector('#sanctionedDe').value = record.sanctionedDe || '';
                 form.querySelector('#tenderStatus').value = record.tenderStatus || '';
@@ -712,12 +757,20 @@
                 form.querySelector('#substructure').value = record.substructureStatus || '';
                 form.querySelector('#superstructure').value = record.superStructureStatus || '';
                 form.querySelector('#commissioning').value = record.commissioningStatus || '';
-                form.querySelector('#exitsGad').value = record.gadExit === 'Y' ? 'Yes' : (record.gadExit === 'N' ? 'No' : '');
+                form.querySelector('#exitsGad').value = record.gadExit || '';
                 form.querySelector('#designField').value = record.design || '';
                 form.querySelector('#exitNo').value = record.exitNo || '';
                 form.querySelector('#noExit').value = record.noExit || '';
                 form.querySelector('#nocClosingLc').value = record.nocClosingLc || '';
                 form.querySelector('#soa').value = record.soa || '';
+
+                // Yes/No remark textareas: fill them in from the record, then sync
+                // each one's visibility (only shown when its select is "No").
+                form.querySelector('#gadRemark').value = record.gadRemark || '';
+                form.querySelector('#checkedReceivedRemark').value = record.checkedReceivedRemark || '';
+                form.querySelector('#exitsGadRemark').value = record.exitsGadRemark || '';
+                ['gad', 'checkedReceived', 'exitsGad'].forEach(syncYesNoRemark);
+
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
@@ -808,43 +861,43 @@
                 const unsanctionFile = sanitizeFilename(`${divisionName}_${tabLabel}_UnSanction`);
 
                 const toolbar = (tableId, title, filename) => `
-                    <div class="d-flex justify-content-end gap-2 mb-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary export-print-btn"
-                                data-table-id="${tableId}" data-title="${esc(title)}">Print</button>
-                        <button type="button" class="btn btn-sm btn-outline-success export-excel-btn"
-                                data-table-id="${tableId}" data-filename="${esc(filename)}">Excel</button>
-                        <button type="button" class="btn btn-sm btn-outline-danger export-pdf-btn"
-                                data-table-id="${tableId}" data-title="${esc(title)}" data-filename="${esc(filename)}">PDF</button>
-                    </div>`;
+                            <div class="d-flex justify-content-end gap-2 mb-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary export-print-btn"
+                                        data-table-id="${tableId}" data-title="${esc(title)}">Print</button>
+                                <button type="button" class="btn btn-sm btn-outline-success export-excel-btn"
+                                        data-table-id="${tableId}" data-filename="${esc(filename)}">Excel</button>
+                                <button type="button" class="btn btn-sm btn-outline-danger export-pdf-btn"
+                                        data-table-id="${tableId}" data-title="${esc(title)}" data-filename="${esc(filename)}">PDF</button>
+                            </div>`;
 
                 return `
-                            <div class="mb-4">
-                                <h6 class="fw-bold mb-2">${esc(divisionName)} <span class="text-muted fw-normal">(${rows.length} record${rows.length === 1 ? '' : 's'})</span></h6>
-                                <div class="table-responsive">
+                                    <div class="mb-4">
+                                        <h6 class="fw-bold mb-2">${esc(divisionName)} <span class="text-muted fw-normal">(${rows.length} record${rows.length === 1 ? '' : 's'})</span></h6>
+                                        <div class="table-responsive">
 
-        <ul class="nav nav-tabs mb-3" id="${navId}" role="tablist">
-        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#${sanctionTabId}" type="button">Sanction (${sanctionRows.length})</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#${unsanctionTabId}" type="button">UnSanction (${unsanctionRows.length})</button></li>
-        </ul>
-        <div class="tab-content">
-        <div class="tab-pane fade show active" id="${sanctionTabId}">
-        ${toolbar(sanctionTableId, sanctionTitle, sanctionFile)}
-        <table id="${sanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
-                                        <thead><tr>${headerCells}</tr></thead>
-                                        <tbody>${buildRowsHtml(sanctionRows, columns)}</tbody>
-                                    </table>
-        </div>
-        <div class="tab-pane fade" id="${unsanctionTabId}">
-        ${toolbar(unsanctionTableId, unsanctionTitle, unsanctionFile)}
-        <table id="${unsanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
-                                        <thead><tr>${headerCells}</tr></thead>
-                                        <tbody>${buildRowsHtml(unsanctionRows, columns)}</tbody>
-                                    </table>
-        </div>
-        </div>
+                <ul class="nav nav-tabs mb-3" id="${navId}" role="tablist">
+                <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#${sanctionTabId}" type="button">Sanction (${sanctionRows.length})</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#${unsanctionTabId}" type="button">UnSanction (${unsanctionRows.length})</button></li>
+                </ul>
+                <div class="tab-content">
+                <div class="tab-pane fade show active" id="${sanctionTabId}">
+                ${toolbar(sanctionTableId, sanctionTitle, sanctionFile)}
+                <table id="${sanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
+                                                <thead><tr>${headerCells}</tr></thead>
+                                                <tbody>${buildRowsHtml(sanctionRows, columns)}</tbody>
+                                            </table>
+                </div>
+                <div class="tab-pane fade" id="${unsanctionTabId}">
+                ${toolbar(unsanctionTableId, unsanctionTitle, unsanctionFile)}
+                <table id="${unsanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
+                                                <thead><tr>${headerCells}</tr></thead>
+                                                <tbody>${buildRowsHtml(unsanctionRows, columns)}</tbody>
+                                            </table>
+                </div>
+                </div>
 
-                                </div>
-                            </div>`;
+                                        </div>
+                                    </div>`;
             }
 
             function renderTabs(data) {
@@ -888,7 +941,7 @@
 
             if (recordsTabs) {
 
-                recordsTabs.addEventListener("click", async function (e) {
+                recordsTabs.addEventListener("click", async function(e) {
 
                     // -------------------------
                     // Export Buttons
@@ -1038,6 +1091,7 @@
                         form.reset();
                         form.classList.remove('was-validated');
                         document.getElementById('recordId').value = 0;
+                        ['gad', 'checkedReceived', 'exitsGad'].forEach(syncYesNoRemark);
                         loadRecords();
                     }
                 } catch (err) {
@@ -1049,6 +1103,7 @@
                 form.reset();
                 form.classList.remove('was-validated');
                 document.getElementById('recordId').value = 0;
+                ['gad', 'checkedReceived', 'exitsGad'].forEach(syncYesNoRemark);
                 setStatus('', false);
             });
 

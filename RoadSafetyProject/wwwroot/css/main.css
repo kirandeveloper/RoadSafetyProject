@@ -1400,6 +1400,42 @@ iframe {
 
 /* person engage pssa */
 
+.nav-tabs{
+	border-bottom:none !important;
+}
+
+	.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+		font-family: 'Poppins-Medium';
+		background-color: rgb(20 49 92) !important;
+		color: #fff !important;
+		font-size: 0.8rem !important;
+		border: 0px !important;
+		border-radius: 3px !important;
+	}
+
+	.nav-tabs .nav-link {
+		font-family: 'Poppins-Medium';
+		background-color: transparent !important;
+		color: #14315c !important;
+		font-size: 0.8rem !important;
+		border-radius: 0px !important;
+	}
+
+#body-basic h6 {
+	font-family: 'Poppins-Medium';
+	font-size: 1rem;
+	background: #fff1e8;
+	color: #fd7e14;
+	padding: 15px 20px;
+	border-bottom: 1px solid #e9ecef;
+	border-radius: 12px 12px 0 0;
+}
+
+	#body-basic h6 span {
+		font-family: 'Poppins-Medium';
+		font-size: 0.8rem;
+	}
+
 
 
 

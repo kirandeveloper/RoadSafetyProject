@@ -1,3 +1,5 @@
+console.log("JavaScript Loaded");
+
 document.querySelectorAll('.lc-link').forEach(link => {
 
     link.addEventListener('click', function () {
@@ -1109,5 +1111,39 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+document.addEventListener("DOMContentLoaded", function () {
 
+    const gad = document.getElementById("gad");
+    const gadRemarkDiv = document.getElementById("gadRemarkDiv");
+    const gadRemark = document.getElementById("gadRemark");
+
+    function toggleGadRemark() {
+
+        if (gad.value === "No") {
+            gadRemarkDiv.classList.remove("d-none");
+        }
+        else {
+            gadRemarkDiv.classList.add("d-none");
+            gadRemark.value = "";
+        }
+    }
+
+    // Run on page load
+    toggleGadRemark();
+
+    // Run whenever dropdown changes
+    gad.addEventListener("change", toggleGadRemark);
+
+});
+
+function toggleGadRemark() {
+    console.log("Selected:", gad.value);
+
+    if (gad.value === "No") {
+        gadRemarkDiv.classList.remove("d-none");
+    }
+    else {
+        gadRemarkDiv.classList.add("d-none");
+    }
+}
 

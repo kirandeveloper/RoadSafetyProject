@@ -64,6 +64,11 @@ namespace RoadSafetyProject.Models
         public string NocClosingLc { get; set; }             // NOC_CLOSING_LC
         public string Soa { get; set; }                       // SOA
 
-        
+        public string GadRemark { get; set; }
+        public string CheckedReceivedRemark { get; set; }
+        public string GadExitRemark { get; set; }
+
+
+
     }
 }

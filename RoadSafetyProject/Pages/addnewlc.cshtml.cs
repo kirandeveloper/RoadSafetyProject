@@ -131,7 +131,9 @@ namespace RoadSafetyProject.Pages
         public string dprConsultancy { get; set; }
         public string executiveAgency { get; set; }
         public string gad { get; set; }
+        public string gadRemark { get; set; }
         public string checkedReceived { get; set; }
+        public string checkedReceivedRemark { get; set; }
         public decimal? sanctionedCont { get; set; }
         public decimal? sanctionedDe { get; set; }
         public string tenderStatus { get; set; }
@@ -152,6 +154,7 @@ namespace RoadSafetyProject.Pages
         public string superstructure { get; set; }
         public string commissioning { get; set; }
         public string exitsGad { get; set; }
+        public string exitsGadRemark { get; set; }
         public string designField { get; set; }
         public string exitNo { get; set; }
         public string noExit { get; set; }
@@ -177,7 +180,9 @@ namespace RoadSafetyProject.Pages
                 DprConsultancy = dprConsultancy,
                 ExecutiveAgency = executiveAgency,
                 Gad = gad,
+                GadRemark = gadRemark,
                 CheckedReceived = checkedReceived,
+                CheckedReceivedRemark = checkedReceivedRemark,
                 SanctionedCont = sanctionedCont,
                 SanctionedDe = sanctionedDe,
                 TenderStatus = tenderStatus,
@@ -198,6 +203,7 @@ namespace RoadSafetyProject.Pages
                 SuperStructureStatus = superstructure,
                 CommissioningStatus = commissioning,
                 GadExit = exitsGad,
+                GadExitRemark = exitsGadRemark,
                 ExitNo = exitNo,
                 NoExit = noExit,
                 Design = designField,
