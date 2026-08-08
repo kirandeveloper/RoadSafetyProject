@@ -138,7 +138,7 @@ p{
 }
 
 #contain-main{
-	padding-top:100px;
+	padding-top:85px;
 }
 
 .dashboard-card {
@@ -231,6 +231,62 @@ p{
 	color: #dc3545;
 }
 
+/* Default Tabs */
+.sanction-tab,
+.unsanction-tab {
+	font-weight: 600;
+	border-radius: 6px 6px 0 0;
+	margin-right: 5px;
+	transition: all 0.3s ease;
+}
+
+	/* Sanction Active */
+	.sanction-tab.active {
+		background: #198754 !important; /* Bootstrap Green */
+		color: #fff !important;
+		border-color: #198754 !important;
+	}
+
+	/* Sanction Hover */
+	.sanction-tab:hover {
+		background: #198754;
+		color: #fff;
+	}
+
+	/* UnSanction Active */
+	.unsanction-tab.active {
+		background: #dc3545 !important; /* Bootstrap Red */
+		color: #fff !important;
+		border-color: #dc3545 !important;
+	}
+
+	/* UnSanction Hover */
+	.unsanction-tab:hover {
+		background: #dc3545;
+		color: #fff;
+	}
+
+/* Optional - Remove Bootstrap Focus Shadow */
+.nav-tabs .nav-link:focus {
+	box-shadow: none;
+}
+
+.addnewlc {
+	font-family: 'Poppins-Medium';
+	font-size: 1.2rem;
+}
+
+.btn-secondary{
+	background:none !important;
+	border:none;
+}
+.btn-secondary:hover{
+	color:#000 !important;
+}
+
+.btn-group .dropdown-item{
+	color:#000 !important;
+}
 /* Solapur */
 .card-solapur {
 	border-top: 5px solid #0d6efd;
@@ -297,7 +353,7 @@ p{
 	padding: 15px 20px;
 	border-bottom: 1px solid #e9ecef;
 	font-weight: 600;
-	font-size: 1rem;
+	font-size: 1.4rem;
 	border-radius: 12px 12px 0 0;
 }
 
@@ -316,10 +372,14 @@ p{
 	vertical-align: text-top;
 }
 
-.table tbody tr td {
-	font-size: 0.8rem;
-	text-align: center;
-}
+	.table tbody tr td {
+		font-size: 0.8rem;
+		text-align: center;
+		border-bottom 1px solid #c0c0c0;
+		border-left: 0px !important;
+		border-right: 0px !important;
+		padding: 10px 0px;
+	}
 
 /* table header sticky */
 
@@ -336,6 +396,7 @@ p{
     color: #000;
     z-index: 10;
     border: 1px solid #dee2e6;
+	padding:10px;
 }
 
 /* First Header Row */
@@ -531,6 +592,10 @@ thead {
 
 tfoot {
 	display: table-footer-group;
+}
+
+.bi{
+	font-size:1.2rem;
 }
 
 footer {
@@ -1406,7 +1471,7 @@ iframe {
 
 	.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
 		font-family: 'Poppins-Medium';
-		background-color: rgb(20 49 92) !important;
+		background-color: rgb(20 49 92);
 		color: #fff !important;
 		font-size: 0.8rem !important;
 		border: 0px !important;
@@ -1415,13 +1480,13 @@ iframe {
 
 	.nav-tabs .nav-link {
 		font-family: 'Poppins-Medium';
-		background-color: transparent !important;
+		background-color: transparent;
 		color: #14315c !important;
 		font-size: 0.8rem !important;
 		border-radius: 0px !important;
 	}
 
-#body-basic h6 {
+.body-basic-header {
 	font-family: 'Poppins-Medium';
 	font-size: 1rem;
 	background: #fff1e8;
@@ -1429,11 +1494,12 @@ iframe {
 	padding: 15px 20px;
 	border-bottom: 1px solid #e9ecef;
 	border-radius: 12px 12px 0 0;
+	border-top: 5px solid #fd7e14;
 }
 
 	#body-basic h6 span {
 		font-family: 'Poppins-Medium';
-		font-size: 0.8rem;
+		font-size: 1.2rem;
 	}
 
 

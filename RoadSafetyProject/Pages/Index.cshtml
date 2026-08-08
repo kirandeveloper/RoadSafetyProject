@@ -1,8 +1,10 @@
 ﻿@page
 @model IndexModel
+
 @{
     ViewData["Title"] = "Home page";
 }
+
 @Html.AntiForgeryToken()
 
 <!-- Main Content -->
@@ -11,9 +13,7 @@
     <div class="row mb-4">
         <div class="col-md-4 mb-3">
             <div class="stats-box p-0">
-                <img src="img/LC-Banner01.png"
-                     alt="LC Banner"
-                     class="img-thumbnail rshomeimg" />
+                <img src="img/LC-Banner01.png" alt="LC Banner" class="img-thumbnail rshomeimg" />
             </div>
         </div>
         <div class="col-md-8 mb-3">
@@ -55,11 +55,11 @@
             <!-- Saved LC Records (merged from addnewlc.cshtml) -->
             <div class="col-lg-12 my-4">
                 <div class="dashboard-card">
-                    <div class="card-header-custom d-flex justify-content-between align-items-center">
+                   <!-- <div class="card-header-custom d-flex justify-content-between align-items-center">
                         <span>Saved LC Records</span>
-                        <a class="btn btn-sm btn-light" href="addnewlc">+ Add New LC</a>
+                        <a class="btn btn-sm btn-light addnewlc" href="addnewlc">+ Add New LC</a>
                     </div>
-
+                    -->
                     <div class="p-3">
                         <div id="recordsStatus" class="mb-2"></div>
 
@@ -88,32 +88,44 @@
 
                             <!-- Basic Details -->
                             <div class="tab-pane fade show active" id="tab-basic" role="tabpanel">
-                                <div id="body-basic"><p class="text-center text-muted">Loading...</p></div>
+                                <div id="body-basic">
+                                    <p class="text-center text-muted">Loading...</p>
+                                </div>
                             </div>
 
                             <!-- Tender Details -->
                             <div class="tab-pane fade" id="tab-tender" role="tabpanel">
-                                <div id="body-tender"><p class="text-center text-muted">Loading...</p></div>
+                                <div id="body-tender">
+                                    <p class="text-center text-muted">Loading...</p>
+                                </div>
                             </div>
 
                             <!-- Land Acquisition -->
                             <div class="tab-pane fade" id="tab-land" role="tabpanel">
-                                <div id="body-land"><p class="text-center text-muted">Loading...</p></div>
+                                <div id="body-land">
+                                    <p class="text-center text-muted">Loading...</p>
+                                </div>
                             </div>
 
                             <!-- Utility Shifting -->
                             <div class="tab-pane fade" id="tab-utility" role="tabpanel">
-                                <div id="body-utility"><p class="text-center text-muted">Loading...</p></div>
+                                <div id="body-utility">
+                                    <p class="text-center text-muted">Loading...</p>
+                                </div>
                             </div>
 
                             <!-- Design -->
                             <div class="tab-pane fade" id="tab-design" role="tabpanel">
-                                <div id="body-design"><p class="text-center text-muted">Loading...</p></div>
+                                <div id="body-design">
+                                    <p class="text-center text-muted">Loading...</p>
+                                </div>
                             </div>
 
                             <!-- NOC -->
                             <div class="tab-pane fade" id="tab-noc" role="tabpanel">
-                                <div id="body-noc"><p class="text-center text-muted">Loading...</p></div>
+                                <div id="body-noc">
+                                    <p class="text-center text-muted">Loading...</p>
+                                </div>
                             </div>
 
                         </div>
@@ -122,17 +134,17 @@
             </div>
             <!-- Saved LC Records (merged from addnewlc.cshtml) -->
 
-            
+
         </div>
     </div>
 </div>
 
 @section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    <script>
-        (function() {
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+    (function() {
             // Saved LC Records grid — merged from addnewlc.cshtml.
             // NOTE: the Add/Edit form itself lives on the "addnewlc" page, so the
             // Edit button here just takes the user there instead of populating a
@@ -275,9 +287,9 @@
 
             function actionsCell(id) {
                 return `<td>
-                                                                        <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${id}">Edit</button>
-                                                                        <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${id}">Delete</button>
-                                                                    </td>`;
+                                    <button class="btn btn-sm edit-btn" data-id="${id}"><i class="bi bi-pencil"></i></button>
+                                    <button class="btn btn-sm delete-btn" data-id="${id}"><i class="bi bi-trash"></i></button>
+                       </td>`;
             }
 
             function yn(v) { return v === 'Y' ? 'Yes' : (v === 'N' ? 'No' : ''); }
@@ -364,25 +376,49 @@
 
                 const toolbar = (tableId, title, filename) => `
                                                         <div class="d-flex justify-content-end gap-2 mb-2">
-                                                            <button type="button" class="btn btn-sm btn-outline-secondary export-print-btn"
+                                                            <button type="button" class="btn btn-sm export-print-btn"
                                                                             data-table-id="${tableId}" data-title="${esc(title)}"><i class="bi bi-printer-fill"></i></button>
-                                                            <button type="button" class="btn btn-sm btn-outline-success export-excel-btn"
+                                                            <button type="button" class="btn btn-sm export-excel-btn"
                                                                             data-table-id="${tableId}" data-filename="${esc(filename)}"><i class="bi bi-file-earmark-excel-fill"></i></button>
-                                                            <button type="button" class="btn btn-sm btn-outline-danger export-pdf-btn"
+                                                            <button type="button" class="btn btn-sm export-pdf-btn"
                                                                             data-table-id="${tableId}" data-title="${esc(title)}" data-filename="${esc(filename)}"><i class="bi bi-file-earmark-pdf-fill"></i></button>
                                                         </div>`;
 
                 return `
                                                                 <div class="mb-4">
-                                                                    <h6 class="fw-bold mb-2">${esc(divisionName)} <span class="text-muted fw-normal">(${rows.length} record${rows.length === 1 ? '' : 's'})</span></h6>
+                                                                                   <div class="row body-basic-header">
+                                                                      <div class="col-md-6 col-6">
+                                                                           <h5 class="fw-bold mb-2">${esc(divisionName)} <span class="text-muted fw-normal">(${rows.length} record${rows.length === 1 ? '' : 's'})</span></h5>
+                                                                      </div>
+                                                                      <div class="col-md-6 col-6">
+                                                                                 <ul class="nav nav-tabs mb-3 justify-content-end" id="${navId}" role="tablist">
+                                                                               <li class="nav-item">
+                                                                                    <button class="nav-link sanction-tab active"
+                                                                                            data-bs-toggle="tab"
+                                                                                            data-bs-target="#${sanctionTabId}"
+                                                                                            type="button">
+                                                                                        Sanction (${sanctionRows.length})
+                                                                                    </button>
+                                                                                </li>
+
+                                                                                <li class="nav-item">
+                                                                                    <button class="nav-link unsanction-tab"
+                                                                                            data-bs-toggle="tab"
+                                                                                            data-bs-target="#${unsanctionTabId}"
+                                                                                            type="button">
+                                                                                        UnSanction (${unsanctionRows.length})
+                                                                                    </button>
+                                                                                </li>
+                                                                        </ul>
+                                                                      </div>
+                                                                   </div>
+                                                                    
                                                                     <div class="table-responsive">
 
-                                            <ul class="nav nav-tabs mb-3" id="${navId}" role="tablist">
-                                            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#${sanctionTabId}" type="button">Sanction (${sanctionRows.length})</button></li>
-                                            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#${unsanctionTabId}" type="button">UnSanction (${unsanctionRows.length})</button></li>
-                                            </ul>
+                                           
                                             <div class="tab-content">
                                             <div class="tab-pane fade show active" id="${sanctionTabId}">
+                                                    <h3 class="pt-4 ps-3 text-success">Status of Sanction work for LC elimination under construction/Road Saftey Project</h3>
                                             ${toolbar(sanctionTableId, sanctionTitle, sanctionFile)}
                                             <table id="${sanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
                                                                             <thead><tr>${headerCells}</tr></thead>
@@ -390,6 +426,7 @@
                                                                         </table>
                                             </div>
                                             <div class="tab-pane fade" id="${unsanctionTabId}">
+                                                    <h3 class="pt-4 ps-3 text-danger">Status of UnSanction work ROB assigned to RSP</h3>
                                             ${toolbar(unsanctionTableId, unsanctionTitle, unsanctionFile)}
                                             <table id="${unsanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
                                                                             <thead><tr>${headerCells}</tr></thead>
@@ -503,5 +540,5 @@
             loadRecords();
             loadDivisionSummary();
         })();
-    </script>
+</script>
 }

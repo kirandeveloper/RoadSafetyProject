@@ -1,0 +1,386 @@
+﻿@page
+@model RoadSafetyProject.Pages.viewalllcModel
+@{
+    ViewData["Title"] = "All LC Records";
+
+    // Fixed division buckets, in display order. "Other" catches any record whose
+    // Division text doesn't match one of the five known divisions (blank, typo, etc.)
+    // so no record silently disappears from the page.
+    var divisions = new (string Key, string Label)[]
+    {
+        ("Mumbai", "Mumbai"),
+        ("BSL", "Bhusawal"),
+        ("NGP", "Nagpur"),
+        ("Pune", "Pune"),
+        ("SUR", "Solapur"),
+        ("Other", "Other / Unspecified"),
+    };
+
+    var statuses = new (string Key, string Label)[]
+    {
+        ("sanction", "Sanction"),
+        ("unsanction", "UnSanction"),
+    };
+}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<div class="content-wrapper">
+    <div class="container-fluid mb-4">
+        <div class="col-md-12">
+            <div class="form-card">
+                <div class="rob-sheet">
+
+                    <div class="rob-titleblock">
+                        <div>
+                            <div class="eyebrow">Road Over Bridge · Project Data Sheet</div>
+                            <h1>All LC Records</h1>
+                        </div>
+                        <div class="rob-meta">
+                            <a href="addnewlc" class="btn btn-sm btn-light">+ Add New LC</a>
+                        </div>
+                    </div>
+
+                    <div id="recordsStatus" class="mb-2"></div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <input type="text" id="searchLcNo" class="form-control" placeholder="Search by LC No...">
+                        </div>
+                    </div>
+
+                    <!-- Level 1: Sanction / UnSanction -->
+                    <ul class="nav nav-tabs" id="statusTabs" role="tablist">
+                        @foreach (var (sKey, sLabel) in statuses)
+                        {
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link @(sKey == statuses[0].Key ? "active" : "")"
+                                        id="tab-@(sKey)-btn" data-bs-toggle="tab" data-bs-target="#tab-@(sKey)"
+                                        type="button" role="tab">
+                                    @sLabel (<span id="count-@(sKey)">0</span>)
+                                </button>
+                            </li>
+                        }
+                    </ul>
+
+                    <div class="tab-content border border-top-0 p-3" id="statusTabsContent">
+                        @foreach (var (sKey, sLabel) in statuses)
+                        {
+                            <div class="tab-pane fade @(sKey == statuses[0].Key ? "show active" : "")" id="tab-@(sKey)" role="tabpanel">
+
+                                <!-- Level 2: Division, within this status -->
+                                <ul class="nav nav-pills mb-3" id="divTabs-@(sKey)" role="tablist">
+                                    @foreach (var (dKey, dLabel) in divisions)
+                                    {
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link @(dKey == divisions[0].Key ? "active" : "")"
+                                                    data-bs-toggle="pill" data-bs-target="#pane-@(sKey)-@(dKey)"
+                                                    type="button" role="tab">
+                                                @dLabel (<span id="count-@(sKey)-@(dKey)">0</span>)
+                                            </button>
+                                        </li>
+                                    }
+                                </ul>
+
+                                <div class="tab-content">
+                                    @foreach (var (dKey, dLabel) in divisions)
+                                    {
+                                        <div class="tab-pane fade @(dKey == divisions[0].Key ? "show active" : "")" id="pane-@(sKey)-@(dKey)" role="tabpanel">
+                                            <div class="table-responsive">
+                                                <table id="tbl-@(sKey)-@(dKey)" class="table table-bordered table-hover table-sm nowrap" style="width:100%"></table>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                            </div>
+                        }
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- DataTables needs jQuery. Skip this if your _Layout.cshtml already loads it elsewhere. -->
+    <script>
+        if (typeof jQuery === 'undefined') {
+            document.write('<script src="https://code.jquery.com/jquery-3.7.1.min.js"><\/script>');
+        }
+    </script>
+
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
+    <!-- Excel export needs JSZip; PDF export needs pdfMake + its fonts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+    <script>
+        (function() {
+            const statusEl = document.getElementById('recordsStatus');
+
+            function setStatus(message, isError) {
+                if (!statusEl) return;
+                statusEl.textContent = message || '';
+                statusEl.className = 'mb-2 ' + (isError ? 'text-danger' : 'text-success');
+            }
+
+            // CHAR(1) Y/N columns (GAD, Checked & Received) rendered as words.
+            function yn(v) { return v === 'Y' ? 'Yes' : (v === 'N' ? 'No' : (v || '')); }
+
+            // Date columns come over as ISO strings (or null); render as DD-MM-YYYY.
+            function dt(v) {
+                if (!v) return '';
+                const d = new Date(v);
+                if (isNaN(d.getTime())) return '';
+                const pad = n => String(n).padStart(2, '0');
+                return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
+            }
+
+            function text(v) { return v == null ? '' : v; }
+
+            // Shared column definitions, reused for all 12 tables. DataTables builds the
+            // header row from `title` automatically since none of the <table> elements
+            // has a hand-written <thead>.
+            function buildColumns() {
+                return [
+                    { data: 'id', title: 'ID' },
+                    { data: 'lcStatus', title: 'LC Status', render: text },
+                    { data: 'srNo', title: 'Sr No', render: text },
+                    { data: 'yearOfSanction', title: 'Year of Sanction', render: text },
+                    { data: 'lcNo', name: 'lcNo', title: 'LC No.', render: text },
+                    { data: 'locationKm', title: 'Location Km', render: text },
+                    { data: 'division', title: 'Division', render: text },
+                    { data: 'sectionName', title: 'Section', render: text },
+                    { data: 'spanArrangement', title: 'Span Arrangement', render: text },
+                    { data: 'skewAngle', title: 'Skew Angle', render: text },
+                    { data: 'distanceExistingLc', title: 'Distance from Existing LC', render: text },
+                    { data: 'stateAuthorityApproval', title: 'State Authority Approval', render: text },
+                    { data: 'dprConsultancy', title: 'DPR Consultancy', render: text },
+                    { data: 'executiveAgency', title: 'Executive Agency', render: text },
+                    { data: 'gad', title: 'GAD', render: (v, type) => type === 'display' ? yn(v) : v },
+                    { data: 'gadRemark', title: 'GAD Remark', render: text },
+                    { data: 'checkedReceived', title: 'Checked & Received', render: (v, type) => type === 'display' ? yn(v) : v },
+                    { data: 'checkedReceivedRemark', title: 'Checked & Received Remark', render: text },
+                    { data: 'sanctionedCont', title: 'Sanctioned Cont (Cr)', render: text },
+                    { data: 'sanctionedDe', title: 'Sanctioned DE (Cr)', render: text },
+                    { data: 'tenderStatus', title: 'Status of Tender', render: text },
+                    { data: 'lc7a37a', title: '7A / 37A', render: (v, type) => type === 'display' ? dt(v) : v },
+                    { data: 'gazette20A', title: '20A Gazette', render: (v, type) => type === 'display' ? dt(v) : v },
+                    { data: 'paper20A', title: '20A Paper', render: (v, type) => type === 'display' ? dt(v) : v },
+                    { data: 'form20B', title: '20B', render: (v, type) => type === 'display' ? dt(v) : v },
+                    { data: 'form20C', title: '20C', render: (v, type) => type === 'display' ? dt(v) : v },
+                    { data: 'form20D', title: '20D', render: (v, type) => type === 'display' ? dt(v) : v },
+                    { data: 'gazette20E', title: '20E Gazette', render: (v, type) => type === 'display' ? dt(v) : v },
+                    { data: 'paper20E', title: '20E Paper', render: (v, type) => type === 'display' ? dt(v) : v },
+                    { data: 'form20F', title: '20F', render: (v, type) => type === 'display' ? dt(v) : v },
+                    { data: 'remark', title: 'Land Remark', render: text },
+                    { data: 'stStatus', title: 'S & T', render: text },
+                    { data: 'trdStatus', title: 'TRD', render: text },
+                    { data: 'electricalG', title: 'Electrical (G)', render: text },
+                    { data: 'substructureStatus', title: 'Substructure', render: text },
+                    { data: 'superStructureStatus', title: 'Super Structure', render: text },
+                    { data: 'commissioningStatus', title: 'Commissioning', render: text },
+                    { data: 'gadExit', title: 'Exits / GAD', render: text },
+                    { data: 'gadExitRemark', title: 'Exits / GAD Remark', render: text },
+                    { data: 'exitNo', title: 'Exit No.', render: text },
+                    { data: 'noExit', title: 'No Exit', render: text },
+                    { data: 'design', title: 'Design', render: text },
+                    { data: 'nocClosingLc', title: 'NOC of Closing LC', render: text },
+                    { data: 'soa', title: 'SOA', render: text }
+                ];
+            }
+
+            function buildButtons(filenamePrefix) {
+                return [
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="bi bi-file-earmark-excel-fill"></i>',
+                        titleAttr: 'Export to Excel',
+                        className: 'btn btn-sm btn-outline-success',
+                        title: filenamePrefix,
+                        exportOptions: { columns: ':visible' }
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="bi bi-file-earmark-pdf-fill"></i>',
+                        titleAttr: 'Export to PDF',
+                        className: 'btn btn-sm btn-outline-danger',
+                        title: filenamePrefix,
+                        orientation: 'landscape',
+                        pageSize: 'A2',
+                        exportOptions: { columns: ':visible' }
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="bi bi-printer-fill"></i>',
+                        titleAttr: 'Print',
+                        className: 'btn btn-sm btn-outline-secondary',
+                        title: filenamePrefix,
+                        exportOptions: { columns: ':visible' }
+                    },
+                    {
+                        extend: 'colvis',
+                        text: '<i class="bi bi-layout-three-columns"></i>',
+                        titleAttr: 'Show / hide columns',
+                        className: 'btn btn-sm btn-outline-primary'
+                    }
+                ];
+            }
+
+            // A record counts as "UnSanction" only if lcStatus explicitly says so;
+            // anything missing/blank/other is treated as "Sanction" (matches the form default).
+            function isUnSanctionRow(r) {
+                return (r.lcStatus || '').toString().trim().toLowerCase() === 'unsanction';
+            }
+
+            // Matches a record's free-text Division against a known division's short code
+            // (e.g. "BSL") or full name (e.g. "Bhusawal") — case-insensitive, partial match —
+            // since the Add New LC form's division field is free text, not a fixed dropdown.
+            const DIVISIONS = [
+                { key: 'Mumbai', code: 'BB', name: 'Mumbai' },
+                { key: 'BSL', code: 'BSL', name: 'Bhusawal' },
+                { key: 'NGP', code: 'NGP', name: 'Nagpur' },
+                { key: 'Pune', code: 'PA', name: 'Pune' },
+                { key: 'SUR', code: 'SUR', name: 'Solapur' }
+            ];
+            const DIVISION_KEYS = DIVISIONS.map(d => d.key).concat('Other');
+
+            function matchesDivision(divisionText, cfg) {
+                const v = (divisionText || '').toString().trim().toLowerCase();
+                if (!v) return false;
+                return v === cfg.code.toLowerCase() ||
+                    v === cfg.name.toLowerCase() ||
+                    v.includes(cfg.name.toLowerCase()) ||
+                    v.includes(cfg.code.toLowerCase());
+            }
+
+            function divisionKeyFor(row) {
+                const cfg = DIVISIONS.find(c => matchesDivision(row.division, c));
+                return cfg ? cfg.key : 'Other';
+            }
+
+            $(document).ready(function() {
+                const commonOptions = {
+                    scrollX: true,
+                    pageLength: 25,
+                    lengthMenu: [10, 25, 50, 100],
+                    dom: "<'row mb-2'<'col-sm-6'B><'col-sm-6'f>>rtip"
+                };
+
+                // One DataTable per status x division combination (2 x 6 = 12), all
+                // initialized up front (with empty data) and filled in once loadRecords()
+                // fetches the actual rows.
+                const tables = {};
+                ['sanction', 'unsanction'].forEach(statusKey => {
+                    DIVISION_KEYS.forEach(divKey => {
+                        const tableKey = `${statusKey}-${divKey}`;
+                        const el = document.getElementById(`tbl-${tableKey}`);
+                        if (!el) return;
+                        tables[tableKey] = $(el).DataTable(Object.assign({}, commonOptions, {
+                            data: [],
+                            columns: buildColumns(),
+                            buttons: buildButtons(`RSP_MASTER_${statusKey}_${divKey}`)
+                        }));
+                    });
+                });
+
+                // Bootstrap hides inactive tab-panes (display:none), which breaks DataTables'
+                // scrollX column-width math for whichever table is hidden at init time.
+                // Recalculate whenever a pane holding a table actually becomes visible.
+                function adjustPane(paneSelector) {
+                    if (!paneSelector) return;
+                    const tableKey = paneSelector.replace('#', '').replace(/^pane-/, '');
+                    if (tables[tableKey]) tables[tableKey].columns.adjust();
+                }
+
+                // Level 2 (division pills within a status tab)
+                document.querySelectorAll('[id^="divTabs-"] button[data-bs-toggle="pill"]').forEach(btn => {
+                    btn.addEventListener('shown.bs.tab', function(e) {
+                        adjustPane(e.target.getAttribute('data-bs-target'));
+                    });
+                });
+
+                // Level 1 (Sanction / UnSanction): adjust whichever division pane is
+                // currently active inside the status tab that just became visible.
+                document.querySelectorAll('#statusTabs button[data-bs-toggle="tab"]').forEach(btn => {
+                    btn.addEventListener('shown.bs.tab', function(e) {
+                        const statusPaneId = e.target.getAttribute('data-bs-target');
+                        const activePill = document.querySelector(statusPaneId + ' [data-bs-toggle="pill"].active');
+                        if (activePill) adjustPane(activePill.getAttribute('data-bs-target'));
+                    });
+                });
+
+                // Dedicated "Search by LC No" box, applied to every status/division table
+                // at once so the filter holds no matter which tab is currently active.
+                const lcNoSearch = document.getElementById('searchLcNo');
+                if (lcNoSearch) {
+                    let searchTimer;
+                    lcNoSearch.addEventListener('input', function() {
+                        const value = this.value;
+                        clearTimeout(searchTimer);
+                        searchTimer = setTimeout(() => {
+                            Object.values(tables).forEach(t => t.column('lcNo:name').search(value).draw());
+                        }, 200);
+                    });
+                }
+
+                function loadRecords() {
+                    setStatus('', false);
+                    fetch('?handler=List', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                        .then(res => res.json())
+                        .then(json => {
+                            if (!json.success) {
+                                setStatus(json.message || 'Failed to load records.', true);
+                                return;
+                            }
+
+                            const data = json.data || [];
+                            const byStatus = {
+                                sanction: data.filter(r => !isUnSanctionRow(r)),
+                                unsanction: data.filter(isUnSanctionRow)
+                            };
+
+                            document.getElementById('count-sanction').textContent = byStatus.sanction.length;
+                            document.getElementById('count-unsanction').textContent = byStatus.unsanction.length;
+
+                            ['sanction', 'unsanction'].forEach(statusKey => {
+                                DIVISION_KEYS.forEach(divKey => {
+                                    const bucketRows = byStatus[statusKey].filter(r => divisionKeyFor(r) === divKey);
+                                    const tableKey = `${statusKey}-${divKey}`;
+
+                                    const countEl = document.getElementById(`count-${tableKey}`);
+                                    if (countEl) countEl.textContent = bucketRows.length;
+
+                                    if (tables[tableKey]) tables[tableKey].clear().rows.add(bucketRows).draw();
+                                });
+                            });
+
+                            // Fix column widths for whichever table is visible right now.
+                            const activeStatusBtn = document.querySelector('#statusTabs .nav-link.active');
+                            if (activeStatusBtn) {
+                                const statusPaneId = activeStatusBtn.getAttribute('data-bs-target');
+                                const activePill = document.querySelector(statusPaneId + ' [data-bs-toggle="pill"].active');
+                                if (activePill) adjustPane(activePill.getAttribute('data-bs-target'));
+                            }
+                        })
+                        .catch(err => setStatus('Failed to load records: ' + err.message, true));
+                }
+
+                loadRecords();
+            });
+        })();
+    </script>
+}
