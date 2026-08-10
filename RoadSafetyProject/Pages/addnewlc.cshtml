@@ -59,7 +59,7 @@
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" id="yearSanction" name="yearSanction" placeholder=" " required  />
+                                        <input type="text" class="form-control" id="yearSanction" name="yearSanction" placeholder=" " required />
                                         <label for="yearSanction" class="req-label">Year of Sanction</label>
                                     </div>
                                     <div class="invalid-feedback">Enter a valid 4-digit year (1950–2100).</div>
@@ -75,7 +75,7 @@
                                 <div class="col-md-3 mb-3">
                                     <div class="form-floating">
                                         <input type="text" class="form-control" id="locationKm" name="locationKm"
-                                               placeholder=" " required  />
+                                               placeholder=" " required />
                                         <label for="locationKm" class="req-label">Location Km</label>
                                     </div>
                                     <div class="invalid-feedback">Enter chainage as a number, e.g. 42.350.</div>
@@ -541,7 +541,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script>
-        (function() {
+        (function () {
             const form = document.getElementById('robForm');
             const status = document.getElementById('formStatus');
             const resetBtn = document.getElementById('resetBtn');
@@ -680,7 +680,7 @@
                 win.document.write(popupHtml);
                 win.document.close();
 
-                setTimeout(function() {
+                setTimeout(function () {
 
                     win.print();
 
@@ -696,9 +696,9 @@
 
             function actionsCell(id) {
                 return `<td>
-                                            <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${id}">Edit</button>
-                                            <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${id}">Delete</button>
-                                        </td>`;
+                                                    <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${id}">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${id}">Delete</button>
+                                                </td>`;
             }
 
             function yn(v) { return v === 'Y' ? 'Yes' : (v === 'N' ? 'No' : ''); }
@@ -860,43 +860,45 @@
                 const unsanctionFile = sanitizeFilename(`${divisionName}_${tabLabel}_UnSanction`);
 
                 const toolbar = (tableId, title, filename) => `
-                            <div class="d-flex justify-content-end gap-2 mb-2">
-                                <button type="button" class="btn btn-sm btn-outline-secondary export-print-btn"
-                                        data-table-id="${tableId}" data-title="${esc(title)}">Print</button>
-                                <button type="button" class="btn btn-sm btn-outline-success export-excel-btn"
-                                        data-table-id="${tableId}" data-filename="${esc(filename)}">Excel</button>
-                                <button type="button" class="btn btn-sm btn-outline-danger export-pdf-btn"
-                                        data-table-id="${tableId}" data-title="${esc(title)}" data-filename="${esc(filename)}">PDF</button>
-                            </div>`;
+                                    <div class="d-flex justify-content-end gap-2 mb-2">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary export-print-btn"
+                                                data-table-id="${tableId}" data-title="${esc(title)}">Print</button>
+                                        <button type="button" class="btn btn-sm btn-outline-success export-excel-btn"
+                                                data-table-id="${tableId}" data-filename="${esc(filename)}">Excel</button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger export-pdf-btn"
+                                                data-table-id="${tableId}" data-title="${esc(title)}" data-filename="${esc(filename)}">PDF</button>
+                                    </div>`;
 
                 return `
-                                    <div class="mb-4">
-                                        <h6 class="fw-bold mb-2">${esc(divisionName)} <span class="text-muted fw-normal">(${rows.length} record${rows.length === 1 ? '' : 's'})</span></h6>
-                                        <div class="table-responsive">
+                                            <div class="mb-4">
+                                                <h6 class="fw-bold mb-2">${esc(divisionName)} <span class="text-muted fw-normal">(${rows.length} record${rows.length === 1 ? '' : 's'})</span></h6>
+                                                <div class="table-responsive">
 
-                <ul class="nav nav-tabs mb-3" id="${navId}" role="tablist">
-                <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#${sanctionTabId}" type="button">Sanction (${sanctionRows.length})</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#${unsanctionTabId}" type="button">UnSanction (${unsanctionRows.length})</button></li>
-                </ul>
-                <div class="tab-content">
-                <div class="tab-pane fade show active" id="${sanctionTabId}">
-                ${toolbar(sanctionTableId, sanctionTitle, sanctionFile)}
-                <table id="${sanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
-                                                <thead><tr>${headerCells}</tr></thead>
-                                                <tbody>${buildRowsHtml(sanctionRows, columns)}</tbody>
-                                            </table>
-                </div>
-                <div class="tab-pane fade" id="${unsanctionTabId}">
-                ${toolbar(unsanctionTableId, unsanctionTitle, unsanctionFile)}
-                <table id="${unsanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
-                                                <thead><tr>${headerCells}</tr></thead>
-                                                <tbody>${buildRowsHtml(unsanctionRows, columns)}</tbody>
-                                            </table>
-                </div>
-                </div>
+                        <ul class="nav nav-tabs mb-3" id="${navId}" role="tablist">
+                        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#${sanctionTabId}" type="button">Sanction (${sanctionRows.length})</button></li>
+                        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#${unsanctionTabId}" type="button">UnSanction (${unsanctionRows.length})</button></li>
+                        </ul>
+                        <div class="tab-content">
+                        <div class="tab-pane fade show active" id="${sanctionTabId}">
+                        ${toolbar(sanctionTableId, sanctionTitle, sanctionFile)}
+                        <table id="${sanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
+                                                        <thead><tr>${headerCells}</tr></thead>
+                                                        <tbody>${buildRowsHtml(sanctionRows, columns)}</tbody>
+                                                    </table>
+                        <div id="${sanctionTableId}-pagination" class="lc-pagination"></div>
+                        </div>
+                        <div class="tab-pane fade" id="${unsanctionTabId}">
+                        ${toolbar(unsanctionTableId, unsanctionTitle, unsanctionFile)}
+                        <table id="${unsanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
+                                                        <thead><tr>${headerCells}</tr></thead>
+                                                        <tbody>${buildRowsHtml(unsanctionRows, columns)}</tbody>
+                                                    </table>
+                        <div id="${unsanctionTableId}-pagination" class="lc-pagination"></div>
+                        </div>
+                        </div>
 
-                                        </div>
-                                    </div>`;
+                                                </div>
+                                            </div>`;
             }
 
             function renderTabs(data) {
@@ -914,7 +916,145 @@
                     tabBodies[tabKey].innerHTML = groups
                         .map((g, idx) => buildDivisionTable(g.name, g.rows, columns, `${tabKey}-${idx}`, tabTitles[tabKey] || tabKey))
                         .join('');
+
+                    // Initialize independent 10-record pagination for every
+                    // Sanction and UnSanction table in this category/division.
+                    groups.forEach((g, idx) => {
+                        const uid = `${tabKey}-${idx}`;
+                        setupTablePagination(`tbl-sanctionTab-${uid}`);
+                        setupTablePagination(`tbl-unsanctionTab-${uid}`);
+                    });
                 });
+            }
+
+            /*
+             * Client-side pagination.
+             * Every generated table has its own pagination state.
+             * Exactly 10 data records are displayed on each page.
+             */
+            function setupTablePagination(tableId) {
+                const rowsPerPage = 10;
+                const table = document.getElementById(tableId);
+                const pagination = document.getElementById(`${tableId}-pagination`);
+
+                if (!table || !pagination) {
+                    return;
+                }
+
+                const allRows = Array.from(table.querySelectorAll('tbody tr'));
+
+                // Do not paginate the "No records." placeholder row.
+                const dataRows = allRows.filter(row => row.querySelector('.edit-btn, .delete-btn'));
+
+                pagination.innerHTML = '';
+
+                if (dataRows.length <= rowsPerPage) {
+                    dataRows.forEach(row => row.style.display = '');
+                    if (dataRows.length > 0) {
+                        pagination.innerHTML =
+                            `<div class="lc-pagination-info">Showing 1 to ${dataRows.length} of ${dataRows.length} records</div>`;
+                    }
+                    return;
+                }
+
+                let currentPage = 1;
+                const totalPages = Math.ceil(dataRows.length / rowsPerPage);
+
+                function renderPage() {
+                    const start = (currentPage - 1) * rowsPerPage;
+                    const end = start + rowsPerPage;
+
+                    dataRows.forEach((row, index) => {
+                        row.style.display =
+                            index >= start && index < end ? '' : 'none';
+                    });
+
+                    const startRecord = start + 1;
+                    const endRecord = Math.min(end, dataRows.length);
+
+                    pagination.innerHTML = `
+                                <div class="lc-pagination-info">
+                                    Showing ${startRecord} to ${endRecord} of ${dataRows.length} records
+                                </div>
+                                <div class="lc-pagination-controls">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-primary lc-page-btn"
+                                            data-page="prev"
+                                            ${currentPage === 1 ? 'disabled' : ''}>
+                                        &laquo; Previous
+                                    </button>
+                                    ${buildPageButtons(currentPage, totalPages)}
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-primary lc-page-btn"
+                                            data-page="next"
+                                            ${currentPage === totalPages ? 'disabled' : ''}>
+                                        Next &raquo;
+                                    </button>
+                                </div>
+                            `;
+
+                    pagination.querySelectorAll('.lc-page-btn').forEach(button => {
+                        button.addEventListener('click', function () {
+                            const value = this.getAttribute('data-page');
+
+                            if (value === 'prev' && currentPage > 1) {
+                                currentPage--;
+                            } else if (value === 'next' && currentPage < totalPages) {
+                                currentPage++;
+                            } else if (!isNaN(Number(value))) {
+                                currentPage = Number(value);
+                            }
+
+                            renderPage();
+                        });
+                    });
+                }
+
+                function buildPageButtons(current, total) {
+                    const maxVisible = 7;
+                    let pages = [];
+
+                    if (total <= maxVisible) {
+                        for (let i = 1; i <= total; i++) {
+                            pages.push(i);
+                        }
+                    } else {
+                        pages.push(1);
+
+                        let start = Math.max(2, current - 2);
+                        let end = Math.min(total - 1, current + 2);
+
+                        if (start > 2) {
+                            pages.push('...');
+                        }
+
+                        for (let i = start; i <= end; i++) {
+                            pages.push(i);
+                        }
+
+                        if (end < total - 1) {
+                            pages.push('...');
+                        }
+
+                        pages.push(total);
+                    }
+
+                    return pages.map(page => {
+                        if (page === '...') {
+                            return `<span class="lc-page-ellipsis">...</span>`;
+                        }
+
+                        return `
+                                    <button type="button"
+                                            class="btn btn-sm ${page === current ? 'btn-primary' : 'btn-outline-primary'} lc-page-btn"
+                                            data-page="${page}">
+                                        ${page}
+                                    </button>
+                                `;
+                    }).join('');
+                }
+
+                renderPage();
             }
 
             async function loadRecords() {
@@ -940,7 +1080,7 @@
 
             if (recordsTabs) {
 
-                recordsTabs.addEventListener("click", async function(e) {
+                recordsTabs.addEventListener("click", async function (e) {
 
                     // -------------------------
                     // Export Buttons

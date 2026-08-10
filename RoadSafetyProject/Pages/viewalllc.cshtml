@@ -128,7 +128,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
     <script>
-        (function() {
+        (function () {
             const statusEl = document.getElementById('recordsStatus');
 
             function setStatus(message, isError) {
@@ -272,11 +272,11 @@
                 return cfg ? cfg.key : 'Other';
             }
 
-            $(document).ready(function() {
+            $(document).ready(function () {
                 const commonOptions = {
                     scrollX: true,
-                    pageLength: 25,
-                    lengthMenu: [10, 25, 50, 100],
+                    pageLength: 10,
+                    lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
                     dom: "<'row mb-2'<'col-sm-6'B><'col-sm-6'f>>rtip"
                 };
 
@@ -308,7 +308,7 @@
 
                 // Level 2 (division pills within a status tab)
                 document.querySelectorAll('[id^="divTabs-"] button[data-bs-toggle="pill"]').forEach(btn => {
-                    btn.addEventListener('shown.bs.tab', function(e) {
+                    btn.addEventListener('shown.bs.tab', function (e) {
                         adjustPane(e.target.getAttribute('data-bs-target'));
                     });
                 });
@@ -316,7 +316,7 @@
                 // Level 1 (Sanction / UnSanction): adjust whichever division pane is
                 // currently active inside the status tab that just became visible.
                 document.querySelectorAll('#statusTabs button[data-bs-toggle="tab"]').forEach(btn => {
-                    btn.addEventListener('shown.bs.tab', function(e) {
+                    btn.addEventListener('shown.bs.tab', function (e) {
                         const statusPaneId = e.target.getAttribute('data-bs-target');
                         const activePill = document.querySelector(statusPaneId + ' [data-bs-toggle="pill"].active');
                         if (activePill) adjustPane(activePill.getAttribute('data-bs-target'));
@@ -328,7 +328,7 @@
                 const lcNoSearch = document.getElementById('searchLcNo');
                 if (lcNoSearch) {
                     let searchTimer;
-                    lcNoSearch.addEventListener('input', function() {
+                    lcNoSearch.addEventListener('input', function () {
                         const value = this.value;
                         clearTimeout(searchTimer);
                         searchTimer = setTimeout(() => {

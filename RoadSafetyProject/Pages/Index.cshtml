@@ -55,7 +55,7 @@
             <!-- Saved LC Records (merged from addnewlc.cshtml) -->
             <div class="col-lg-12 my-4">
                 <div class="dashboard-card">
-                   <!-- <div class="card-header-custom d-flex justify-content-between align-items-center">
+                    <!-- <div class="card-header-custom d-flex justify-content-between align-items-center">
                         <span>Saved LC Records</span>
                         <a class="btn btn-sm btn-light addnewlc" href="addnewlc">+ Add New LC</a>
                     </div>
@@ -140,11 +140,11 @@
 </div>
 
 @section Scripts {
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<script>
-    (function() {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script>
+        (function () {
             // Saved LC Records grid — merged from addnewlc.cshtml.
             // NOTE: the Add/Edit form itself lives on the "addnewlc" page, so the
             // Edit button here just takes the user there instead of populating a
@@ -276,7 +276,7 @@
                 win.document.write(popupHtml);
                 win.document.close();
 
-                setTimeout(function() { win.print(); }, 300);
+                setTimeout(function () { win.print(); }, 300);
             }
 
             function esc(v) {
@@ -287,9 +287,9 @@
 
             function actionsCell(id) {
                 return `<td>
-                                    <button class="btn btn-sm edit-btn" data-id="${id}"><i class="bi bi-pencil"></i></button>
-                                    <button class="btn btn-sm delete-btn" data-id="${id}"><i class="bi bi-trash"></i></button>
-                       </td>`;
+                                            <button class="btn btn-sm edit-btn" data-id="${id}"><i class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-sm delete-btn" data-id="${id}"><i class="bi bi-trash"></i></button>
+                               </td>`;
             }
 
             function yn(v) { return v === 'Y' ? 'Yes' : (v === 'N' ? 'No' : ''); }
@@ -357,6 +357,138 @@
                 }).join('');
             }
 
+
+            // Client-side pagination: 10 records per page for every
+            // Sanction / UnSanction table generated on this page.
+            function setupTablePagination(tableId, rowsPerPage = 10) {
+                const table = document.getElementById(tableId);
+                if (!table) return;
+
+                const tbody = table.querySelector('tbody');
+                if (!tbody) return;
+
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                // Do not create pagination for an empty result.
+                if (rows.length === 0 ||
+                    (rows.length === 1 && rows[0].querySelector('td.text-muted'))) {
+                    return;
+                }
+
+                const pagination = document.getElementById(`${tableId}-pagination`);
+                if (!pagination) return;
+
+                const totalRecords = rows.length;
+                const totalPages = Math.ceil(totalRecords / rowsPerPage);
+                let currentPage = 1;
+
+                function renderPage(page) {
+                    currentPage = Math.max(1, Math.min(page, totalPages));
+
+                    const start = (currentPage - 1) * rowsPerPage;
+                    const end = start + rowsPerPage;
+
+                    rows.forEach((row, index) => {
+                        row.style.display =
+                            index >= start && index < end ? '' : 'none';
+                    });
+
+                    renderControls();
+                }
+
+                function renderControls() {
+                    pagination.innerHTML = '';
+
+                    if (totalPages <= 1) {
+                        pagination.style.display = 'none';
+                        return;
+                    }
+
+                    pagination.style.display = 'flex';
+
+                    const startRecord = ((currentPage - 1) * rowsPerPage) + 1;
+                    const endRecord = Math.min(currentPage * rowsPerPage, totalRecords);
+
+                    const info = document.createElement('div');
+                    info.className = 'table-page-info';
+                    info.textContent =
+                        `Showing ${startRecord} to ${endRecord} of ${totalRecords} records`;
+
+                    const controls = document.createElement('div');
+                    controls.className = 'table-page-controls';
+
+                    const previous = document.createElement('button');
+                    previous.type = 'button';
+                    previous.className = 'btn btn-sm btn-outline-primary pagination-btn';
+                    previous.innerHTML = '&laquo; Previous';
+                    previous.disabled = currentPage === 1;
+                    previous.addEventListener('click', () => renderPage(currentPage - 1));
+
+                    controls.appendChild(previous);
+
+                    // Show page numbers. For many pages, keep the control compact.
+                    let startPage = Math.max(1, currentPage - 2);
+                    let endPage = Math.min(totalPages, startPage + 4);
+
+                    if (endPage - startPage < 4) {
+                        startPage = Math.max(1, endPage - 4);
+                    }
+
+                    if (startPage > 1) {
+                        addPageButton(1);
+
+                        if (startPage > 2) {
+                            addEllipsis();
+                        }
+                    }
+
+                    for (let page = startPage; page <= endPage; page++) {
+                        addPageButton(page);
+                    }
+
+                    if (endPage < totalPages) {
+                        if (endPage < totalPages - 1) {
+                            addEllipsis();
+                        }
+
+                        addPageButton(totalPages);
+                    }
+
+                    const next = document.createElement('button');
+                    next.type = 'button';
+                    next.className = 'btn btn-sm btn-outline-primary pagination-btn';
+                    next.innerHTML = 'Next &raquo;';
+                    next.disabled = currentPage === totalPages;
+                    next.addEventListener('click', () => renderPage(currentPage + 1));
+
+                    controls.appendChild(next);
+
+                    pagination.appendChild(info);
+                    pagination.appendChild(controls);
+
+                    function addPageButton(page) {
+                        const button = document.createElement('button');
+                        button.type = 'button';
+                        button.className =
+                            `btn btn-sm pagination-btn ${page === currentPage
+                                ? 'btn-primary'
+                                : 'btn-outline-primary'}`;
+                        button.textContent = page;
+                        button.addEventListener('click', () => renderPage(page));
+                        controls.appendChild(button);
+                    }
+
+                    function addEllipsis() {
+                        const span = document.createElement('span');
+                        span.className = 'pagination-ellipsis';
+                        span.textContent = '...';
+                        controls.appendChild(span);
+                    }
+                }
+
+                renderPage(1);
+            }
+
             function buildDivisionTable(divisionName, rows, columns, uid, tabLabel) {
                 const headerCells = columns.map(c => `<th>${esc(c.label)}</th>`).join('') + '<th style="width:130px;">Actions</th>';
 
@@ -375,68 +507,70 @@
                 const unsanctionFile = sanitizeFilename(`${divisionName}_${tabLabel}_UnSanction`);
 
                 const toolbar = (tableId, title, filename) => `
-                                                        <div class="d-flex justify-content-end gap-2 mb-2">
-                                                            <button type="button" class="btn btn-sm export-print-btn"
-                                                                            data-table-id="${tableId}" data-title="${esc(title)}"><i class="bi bi-printer-fill"></i></button>
-                                                            <button type="button" class="btn btn-sm export-excel-btn"
-                                                                            data-table-id="${tableId}" data-filename="${esc(filename)}"><i class="bi bi-file-earmark-excel-fill"></i></button>
-                                                            <button type="button" class="btn btn-sm export-pdf-btn"
-                                                                            data-table-id="${tableId}" data-title="${esc(title)}" data-filename="${esc(filename)}"><i class="bi bi-file-earmark-pdf-fill"></i></button>
-                                                        </div>`;
+                                                                <div class="d-flex justify-content-end gap-2 mb-2">
+                                                                    <button type="button" class="btn btn-sm export-print-btn"
+                                                                                    data-table-id="${tableId}" data-title="${esc(title)}"><i class="bi bi-printer-fill"></i></button>
+                                                                    <button type="button" class="btn btn-sm export-excel-btn"
+                                                                                    data-table-id="${tableId}" data-filename="${esc(filename)}"><i class="bi bi-file-earmark-excel-fill"></i></button>
+                                                                    <button type="button" class="btn btn-sm export-pdf-btn"
+                                                                                    data-table-id="${tableId}" data-title="${esc(title)}" data-filename="${esc(filename)}"><i class="bi bi-file-earmark-pdf-fill"></i></button>
+                                                                </div>`;
 
                 return `
-                                                                <div class="mb-4">
-                                                                                   <div class="row body-basic-header">
-                                                                      <div class="col-md-6 col-6">
-                                                                           <h5 class="fw-bold mb-2">${esc(divisionName)} <span class="text-muted fw-normal">(${rows.length} record${rows.length === 1 ? '' : 's'})</span></h5>
-                                                                      </div>
-                                                                      <div class="col-md-6 col-6">
-                                                                                 <ul class="nav nav-tabs mb-3 justify-content-end" id="${navId}" role="tablist">
-                                                                               <li class="nav-item">
-                                                                                    <button class="nav-link sanction-tab active"
-                                                                                            data-bs-toggle="tab"
-                                                                                            data-bs-target="#${sanctionTabId}"
-                                                                                            type="button">
-                                                                                        Sanction (${sanctionRows.length})
-                                                                                    </button>
-                                                                                </li>
+                                                                        <div class="mb-4">
+                                                                                           <div class="row body-basic-header">
+                                                                              <div class="col-md-6 col-6">
+                                                                                   <h5 class="fw-bold mb-2">${esc(divisionName)} <span class="text-muted fw-normal">(${rows.length} record${rows.length === 1 ? '' : 's'})</span></h5>
+                                                                              </div>
+                                                                              <div class="col-md-6 col-6">
+                                                                                         <ul class="nav nav-tabs mb-3 justify-content-end" id="${navId}" role="tablist">
+                                                                                       <li class="nav-item">
+                                                                                            <button class="nav-link sanction-tab active"
+                                                                                                    data-bs-toggle="tab"
+                                                                                                    data-bs-target="#${sanctionTabId}"
+                                                                                                    type="button">
+                                                                                                Sanction (${sanctionRows.length})
+                                                                                            </button>
+                                                                                        </li>
 
-                                                                                <li class="nav-item">
-                                                                                    <button class="nav-link unsanction-tab"
-                                                                                            data-bs-toggle="tab"
-                                                                                            data-bs-target="#${unsanctionTabId}"
-                                                                                            type="button">
-                                                                                        UnSanction (${unsanctionRows.length})
-                                                                                    </button>
-                                                                                </li>
-                                                                        </ul>
-                                                                      </div>
-                                                                   </div>
-                                                                    
-                                                                    <div class="table-responsive">
+                                                                                        <li class="nav-item">
+                                                                                            <button class="nav-link unsanction-tab"
+                                                                                                    data-bs-toggle="tab"
+                                                                                                    data-bs-target="#${unsanctionTabId}"
+                                                                                                    type="button">
+                                                                                                UnSanction (${unsanctionRows.length})
+                                                                                            </button>
+                                                                                        </li>
+                                                                                </ul>
+                                                                              </div>
+                                                                           </div>
+
+                                                                            <div class="table-responsive">
 
                                            
-                                            <div class="tab-content">
-                                            <div class="tab-pane fade show active" id="${sanctionTabId}">
-                                                    <h3 class="pt-4 ps-3 text-success">Status of Sanction work for LC elimination under construction/Road Saftey Project</h3>
-                                            ${toolbar(sanctionTableId, sanctionTitle, sanctionFile)}
-                                            <table id="${sanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
-                                                                            <thead><tr>${headerCells}</tr></thead>
-                                                                            <tbody>${buildRowsHtml(sanctionRows, columns)}</tbody>
-                                                                        </table>
-                                            </div>
-                                            <div class="tab-pane fade" id="${unsanctionTabId}">
-                                                    <h3 class="pt-4 ps-3 text-danger">Status of UnSanction work ROB assigned to RSP</h3>
-                                            ${toolbar(unsanctionTableId, unsanctionTitle, unsanctionFile)}
-                                            <table id="${unsanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
-                                                                            <thead><tr>${headerCells}</tr></thead>
-                                                                            <tbody>${buildRowsHtml(unsanctionRows, columns)}</tbody>
-                                                                        </table>
-                                            </div>
-                                            </div>
+                                                    <div class="tab-content">
+                                                    <div class="tab-pane fade show active" id="${sanctionTabId}">
+                                                            <h3 class="pt-4 ps-3 text-success">Status of Sanction work for LC elimination under construction/Road Saftey Project</h3>
+                                                    ${toolbar(sanctionTableId, sanctionTitle, sanctionFile)}
+                                                    <table id="${sanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
+                                                                                    <thead><tr>${headerCells}</tr></thead>
+                                                                                    <tbody>${buildRowsHtml(sanctionRows, columns)}</tbody>
+                                                                                </table>
+                                                                                <div id="${sanctionTableId}-pagination" class="table-pagination"></div>
+                                                    </div>
+                                                    <div class="tab-pane fade" id="${unsanctionTabId}">
+                                                            <h3 class="pt-4 ps-3 text-danger">Status of UnSanction work ROB assigned to RSP</h3>
+                                                    ${toolbar(unsanctionTableId, unsanctionTitle, unsanctionFile)}
+                                                    <table id="${unsanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
+                                                                                    <thead><tr>${headerCells}</tr></thead>
+                                                                                    <tbody>${buildRowsHtml(unsanctionRows, columns)}</tbody>
+                                                                                </table>
+                                                                                <div id="${unsanctionTableId}-pagination" class="table-pagination"></div>
+                                                    </div>
+                                                    </div>
 
-                                                                    </div>
-                                                                </div>`;
+                                                                            </div>
+                                                                        </div>`;
             }
 
             function renderTabs(data) {
@@ -454,6 +588,12 @@
                     tabBodies[tabKey].innerHTML = groups
                         .map((g, idx) => buildDivisionTable(g.name, g.rows, columns, `${tabKey}-${idx}`, tabTitles[tabKey] || tabKey))
                         .join('');
+
+                    // Give every generated Sanction / UnSanction table its own
+                    // client-side pagination with 10 records per page.
+                    tabBodies[tabKey]
+                        .querySelectorAll('table[id^="tbl-"]')
+                        .forEach(table => setupTablePagination(table.id, 10));
                 });
             }
 
@@ -477,7 +617,7 @@
             const recordsTabs = document.getElementById("recordsTabsContent");
 
             if (recordsTabs) {
-                recordsTabs.addEventListener("click", async function(e) {
+                recordsTabs.addEventListener("click", async function (e) {
 
                     // Export buttons
                     const exportBtn = e.target.closest(".export-print-btn, .export-excel-btn, .export-pdf-btn");
@@ -540,5 +680,5 @@
             loadRecords();
             loadDivisionSummary();
         })();
-</script>
+    </script>
 }
