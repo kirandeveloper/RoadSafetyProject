@@ -59,7 +59,7 @@
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" id="yearSanction" name="yearSanction" placeholder=" " required pattern="^(19[5-9]\d|20\d{2}|2100)$" inputmode="numeric" />
+                                        <input type="text" class="form-control" id="yearSanction" name="yearSanction" placeholder=" " required  />
                                         <label for="yearSanction" class="req-label">Year of Sanction</label>
                                     </div>
                                     <div class="invalid-feedback">Enter a valid 4-digit year (1950–2100).</div>
@@ -67,7 +67,7 @@
                                 <div class="col-md-3 mb-3">
                                     <div class="form-floating">
                                         <input type="text" class="form-control" id="lcNo" name="lcNo"
-                                               placeholder=" " required pattern="^[A-Za-z0-9\-/]{2,20}$">
+                                               placeholder=" " required />
                                         <label for="lcNo" class="req-label">LC No.</label>
                                     </div>
                                     <div class="invalid-feedback">Use letters, numbers, "-" or "/" only.</div>
@@ -75,8 +75,7 @@
                                 <div class="col-md-3 mb-3">
                                     <div class="form-floating">
                                         <input type="text" class="form-control" id="locationKm" name="locationKm"
-                                               placeholder=" " required pattern="^\d{1,4}(\.\d{1,3})?$"
-                                               inputmode="decimal" />
+                                               placeholder=" " required  />
                                         <label for="locationKm" class="req-label">Location Km</label>
                                     </div>
                                     <div class="invalid-feedback">Enter chainage as a number, e.g. 42.350.</div>
@@ -102,7 +101,7 @@
                                 <div class="col-md-4 mb-3">
                                     <div class="form-floating">
                                         <input type="text" class="form-control" id="skewAngle" name="skewAngle"
-                                               placeholder=" " required pattern="^(90(\.0{1,2})?|[0-8]?\d(\.\d{1,2})?)$" inputmode="decimal">
+                                               placeholder=" " required />
                                         <label for="skewAngle" class="req-label">Skew Angle (°)</label>
                                     </div>
                                     <div class="invalid-feedback">Skew angle must be between 0° and 90°.</div>
@@ -111,7 +110,7 @@
                                 <div class="col-md-4 mb-3">
                                     <div class="form-floating">
                                         <input type="text" class="form-control" id="distanceLc" name="distanceLc"
-                                               placeholder=" " required pattern="^\d+$" inputmode="numeric">
+                                               placeholder=" " required />
                                         <label for="distanceLc" class="req-label">Distance from Existing LC (m)</label>
                                     </div>
                                     <div class="invalid-feedback">Enter distance in metres (0 or more).</div>
@@ -198,7 +197,7 @@
                                 <div class="col-md-2 mb-3">
                                     <div class="form-floating">
                                         <input type="text" class="form-control" id="sanctionedCont" name="sanctionedCont"
-                                               placeholder=" " required pattern="^\d+(\.\d{1,2})?$" inputmode="decimal">
+                                               placeholder=" " required />
                                         <label for="sanctionedCont" class="req-label">Sanctioned Cont (Cr)</label>
                                     </div>
                                     <div class="invalid-feedback">Enter a non-negative amount.</div>
@@ -207,7 +206,7 @@
                                 <div class="col-md-2 mb-3">
                                     <div class="form-floating">
                                         <input type="text" class="form-control" id="sanctionedDe" name="sanctionedDe"
-                                               placeholder=" " required pattern="^\d+(\.\d{1,2})?$" inputmode="decimal">
+                                               placeholder=" " required />
                                         <label for="sanctionedDe" class="req-label">Sanctioned DE (Cr)</label>
                                     </div>
                                     <div class="invalid-feedback">Enter a non-negative amount.</div>

@@ -12,7 +12,7 @@ namespace RoadSafetyProject.Models
         public int? SrNo { get; set; }                    // SR_NO
 
         // 01 Basic Details
-        public int? YearOfSanction { get; set; }          // YEAR_OF_SANCTION
+        public string YearOfSanction { get; set; }          // YEAR_OF_SANCTION
         public string LcNo { get; set; }                  // LC_NO
         public string LocationKm { get; set; }             // LOCATION_KM
         public string Division { get; set; }               // DIVISION
@@ -20,7 +20,7 @@ namespace RoadSafetyProject.Models
 
         public string SectionName { get; set; }            // SECTION_NAME
         public string SpanArrangement { get; set; }        // SPAN_ARRANGEMENT
-        public decimal? SkewAngle { get; set; }             // SKEW_ANGLE
+        public string SkewAngle { get; set; }             // SKEW_ANGLE
         public string DistanceExistingLc { get; set; }      // DISTANCE_EXISTING_LC
         public string StateAuthorityApproval { get; set; }  // STATE_AUTHORITY_APPROVAL
         public string DprConsultancy { get; set; }          // DPR_CONSULTANCY
@@ -29,20 +29,20 @@ namespace RoadSafetyProject.Models
         // 02 Tender Details
         public string Gad { get; set; }                    // GAD ('Y'/'N')
         public string CheckedReceived { get; set; }        // CHECKED_RECEIVED ('Y'/'N')
-        public decimal? SanctionedCont { get; set; }        // SANCTIONED_CONT
-        public decimal? SanctionedDe { get; set; }           // SANCTIONED_DE
+        public string SanctionedCont { get; set; }        // SANCTIONED_CONT
+        public string SanctionedDe { get; set; }           // SANCTIONED_DE
         public string TenderStatus { get; set; }            // TENDER_STATUS
 
         // 03 Land Acquisition (DB columns are DATE - parsed from the textarea text)
-        public DateTime? Lc7a37a { get; set; }              // LC_7A_37A
-        public DateTime? Gazette20A { get; set; }           // GAZETTE_20A
-        public DateTime? Paper20A { get; set; }             // PAPER_20A
-        public DateTime? Form20B { get; set; }              // FORM_20B
-        public DateTime? Form20C { get; set; }              // FORM_20C
-        public DateTime? Form20D { get; set; }              // FORM_20D
-        public DateTime? Gazette20E { get; set; }           // GAZETTE_20E
-        public DateTime? Paper20E { get; set; }             // PAPER_20E
-        public DateTime? Form20F { get; set; }              // FORM_20F
+        public string Lc7a37a { get; set; }              // LC_7A_37A
+        public string Gazette20A { get; set; }           // GAZETTE_20A
+        public string Paper20A { get; set; }             // PAPER_20A
+        public string Form20B { get; set; }              // FORM_20B
+        public string Form20C { get; set; }              // FORM_20C
+        public string Form20D { get; set; }              // FORM_20D
+        public string Gazette20E { get; set; }           // GAZETTE_20E
+        public string Paper20E { get; set; }             // PAPER_20E
+        public string Form20F { get; set; }              // FORM_20F
         public string Remark { get; set; }                  // REMARK
 
         // 04 Utility Shifting

@@ -80,7 +80,10 @@ namespace RoadSafetyProject.Pages
             }
             catch (Exception ex)
             {
-                return new JsonResult(new { success = false, message = "Save failed: " + ex.Message }) { StatusCode = 500 };
+                // TEMP DIAGNOSTIC — reveals the exact line/field behind the FormatException.
+                // Revert this to "Save failed: " + ex.Message before deploying; ex.ToString()
+                // can include internal details you don't want a client to see in production.
+                return new JsonResult(new { success = false, message = "Save failed: " + ex.ToString() }) { StatusCode = 500 };
             }
         }
 
@@ -119,13 +122,13 @@ namespace RoadSafetyProject.Pages
         public int id { get; set; }
         public string lcStatus { get; set; }
         public int? srNo { get; set; }
-        public int? yearSanction { get; set; }
+        public string yearSanction { get; set; }
         public string lcNo { get; set; }
         public string locationKm { get; set; }
         public string division { get; set; }
         public string section { get; set; }
         public string spanArrangement { get; set; }
-        public decimal? skewAngle { get; set; }
+        public string skewAngle { get; set; }
         public string distanceLc { get; set; }
         public string stateApproval { get; set; }
         public string dprConsultancy { get; set; }
@@ -134,8 +137,8 @@ namespace RoadSafetyProject.Pages
         public string gadRemark { get; set; }
         public string checkedReceived { get; set; }
         public string checkedReceivedRemark { get; set; }
-        public decimal? sanctionedCont { get; set; }
-        public decimal? sanctionedDe { get; set; }
+        public string sanctionedCont { get; set; }
+        public string sanctionedDe { get; set; }
         public string tenderStatus { get; set; }
         public string sec7a { get; set; }
         public string sec20aGazette { get; set; }
@@ -186,15 +189,15 @@ namespace RoadSafetyProject.Pages
                 SanctionedCont = sanctionedCont,
                 SanctionedDe = sanctionedDe,
                 TenderStatus = tenderStatus,
-                Lc7a37a = ParseDate(sec7a),
-                Gazette20A = ParseDate(sec20aGazette),
-                Paper20A = ParseDate(sec20aPaper),
-                Form20B = ParseDate(sec20b),
-                Form20C = ParseDate(sec20c),
-                Form20D = ParseDate(sec20d),
-                Gazette20E = ParseDate(sec20eGazette),
-                Paper20E = ParseDate(sec20ePaper),
-                Form20F = ParseDate(sec20f),
+                Lc7a37a = sec7a,
+                Gazette20A = sec20aGazette,
+                Paper20A = sec20aPaper,
+                Form20B = sec20b,
+                Form20C = sec20c,
+                Form20D = sec20d,
+                Gazette20E = sec20eGazette,
+                Paper20E = sec20ePaper,
+                Form20F = sec20f,
                 Remark = landRemark,
                 StStatus = utilSnt,
                 TrdStatus = utilTrd,
@@ -210,12 +213,6 @@ namespace RoadSafetyProject.Pages
                 NocClosingLc = nocClosingLc,
                 Soa = soa
             };
-        }
-
-        private static DateTime? ParseDate(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text)) return null;
-            return DateTime.TryParse(text, out var dt) ? dt : (DateTime?)null;
         }
     }
 }

@@ -34,20 +34,20 @@ namespace RoadSafetyProject.Data
                 INSERT INTO RSP_MASTER
                 (ID, SR_NO, YEAR_OF_SANCTION, LC_NO, LOCATION_KM, DIVISION, LC_STATUS, SECTION_NAME,
                  SPAN_ARRANGEMENT, SKEW_ANGLE, DISTANCE_EXISTING_LC, STATE_AUTHORITY_APPROVAL,
-                 DPR_CONSULTANCY, EXECUTIVE_AGENCY, GAD, CHECKED_RECEIVED, SANCTIONED_CONT,
-                 SANCTIONED_DE, TENDER_STATUS, LC_7A_37A, GAZETTE_20A, PAPER_20A, FORM_20B,
+                 DPR_CONSULTANCY, EXECUTIVE_AGENCY, GAD, GAD_REMARK, CHECKED_RECEIVED, CHECKED_RECEIVED_REMARK,
+                 SANCTIONED_CONT, SANCTIONED_DE, TENDER_STATUS, LC_7A_37A, GAZETTE_20A, PAPER_20A, FORM_20B,
                  FORM_20C, FORM_20D, GAZETTE_20E, PAPER_20E, FORM_20F, REMARK, ST_STATUS,
                  TRD_STATUS, ELECTRICAL_G, SUBSTRUCTURE_STATUS, SUPER_STRUCTURE_STATUS,
-                 COMMISSIONING_STATUS, GAD_EXIT, DESIGN_STATUS, EXIT_NO, NO_EXIT, DESIGN,
+                 COMMISSIONING_STATUS, GAD_EXIT, EXITS_GAD_REMARK, DESIGN_STATUS, EXIT_NO, NO_EXIT, DESIGN,
                  NOC_CLOSING_LC, SOA)
                 VALUES
                 (RSP_MASTER_SEQ.NEXTVAL, :srNo, :yearOfSanction, :lcNo, :locationKm, :division, :lcStatus, :sectionName,
                  :spanArrangement, :skewAngle, :distanceExistingLc, :stateAuthorityApproval,
-                 :dprConsultancy, :executiveAgency, :gad, :checkedReceived, :sanctionedCont,
-                 :sanctionedDe, :tenderStatus, :lc7a37a, :gazette20A, :paper20A, :form20B,
+                 :dprConsultancy, :executiveAgency, :gad, :gadRemark, :checkedReceived, :checkedReceivedRemark,
+                 :sanctionedCont, :sanctionedDe, :tenderStatus, :lc7a37a, :gazette20A, :paper20A, :form20B,
                  :form20C, :form20D, :gazette20E, :paper20E, :form20F, :remark, :stStatus,
                  :trdStatus, :electricalG, :substructureStatus, :superStructureStatus,
-                 :commissioningStatus, :gadExit, :designStatus, :exitNo, :noExit, :design,
+                 :commissioningStatus, :gadExit, :gadExitRemark, :designStatus, :exitNo, :noExit, :design,
                  :nocClosingLc, :soa)
                 RETURNING ID INTO :newId";
 
@@ -107,7 +107,9 @@ namespace RoadSafetyProject.Data
                     DPR_CONSULTANCY = :dprConsultancy,
                     EXECUTIVE_AGENCY = :executiveAgency,
                     GAD = :gad,
+                    GAD_REMARK = :gadRemark,
                     CHECKED_RECEIVED = :checkedReceived,
+                    CHECKED_RECEIVED_REMARK = :checkedReceivedRemark,
                     SANCTIONED_CONT = :sanctionedCont,
                     SANCTIONED_DE = :sanctionedDe,
                     TENDER_STATUS = :tenderStatus,
@@ -128,6 +130,7 @@ namespace RoadSafetyProject.Data
                     SUPER_STRUCTURE_STATUS = :superStructureStatus,
                     COMMISSIONING_STATUS = :commissioningStatus,
                     GAD_EXIT = :gadExit,
+                    EXITS_GAD_REMARK = :gadExitRemark,
                     DESIGN_STATUS = :designStatus,
                     EXIT_NO = :exitNo,
                     NO_EXIT = :noExit,
@@ -198,32 +201,34 @@ namespace RoadSafetyProject.Data
         private static void AddParameters(OracleCommand cmd, RspMaster m)
         {
             cmd.Parameters.Add(new OracleParameter("srNo", OracleDbType.Int32) { Value = (object)m.SrNo ?? DBNull.Value });
-            cmd.Parameters.Add(new OracleParameter("yearOfSanction", OracleDbType.Int32) { Value = (object)m.YearOfSanction ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("yearOfSanction", OracleDbType.Varchar2) { Value = (object)m.YearOfSanction ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("lcNo", OracleDbType.Varchar2) { Value = (object)m.LcNo ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("locationKm", OracleDbType.Varchar2) { Value = (object)m.LocationKm ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("division", OracleDbType.Varchar2) { Value = (object)m.Division ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("lcStatus", OracleDbType.Varchar2) { Value = (object)m.LcStatus ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("sectionName", OracleDbType.Varchar2) { Value = (object)m.SectionName ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("spanArrangement", OracleDbType.Varchar2) { Value = (object)m.SpanArrangement ?? DBNull.Value });
-            cmd.Parameters.Add(new OracleParameter("skewAngle", OracleDbType.Decimal) { Value = (object)m.SkewAngle ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("skewAngle", OracleDbType.Varchar2) { Value = (object)m.SkewAngle ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("distanceExistingLc", OracleDbType.Varchar2) { Value = (object)m.DistanceExistingLc ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("stateAuthorityApproval", OracleDbType.Varchar2) { Value = (object)m.StateAuthorityApproval ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("dprConsultancy", OracleDbType.Varchar2) { Value = (object)m.DprConsultancy ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("executiveAgency", OracleDbType.Varchar2) { Value = (object)m.ExecutiveAgency ?? DBNull.Value });
-            cmd.Parameters.Add(new OracleParameter("gad", OracleDbType.Char) { Value = (object)NormalizeYN(m.Gad) ?? DBNull.Value });
-            cmd.Parameters.Add(new OracleParameter("checkedReceived", OracleDbType.Char) { Value = (object)NormalizeYN(m.CheckedReceived) ?? DBNull.Value });
-            cmd.Parameters.Add(new OracleParameter("sanctionedCont", OracleDbType.Decimal) { Value = (object)m.SanctionedCont ?? DBNull.Value });
-            cmd.Parameters.Add(new OracleParameter("sanctionedDe", OracleDbType.Decimal) { Value = (object)m.SanctionedDe ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("gad", OracleDbType.Varchar2) { Value = (object)m.Gad ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("gadRemark", OracleDbType.Varchar2) { Value = (object)m.GadRemark ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("checkedReceived", OracleDbType.Varchar2) { Value = (object)m.CheckedReceived ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("checkedReceivedRemark", OracleDbType.Varchar2) { Value = (object)m.CheckedReceivedRemark ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("sanctionedCont", OracleDbType.Varchar2) { Value = (object)m.SanctionedCont ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("sanctionedDe", OracleDbType.Varchar2) { Value = (object)m.SanctionedDe ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("tenderStatus", OracleDbType.Varchar2) { Value = (object)m.TenderStatus ?? DBNull.Value });
-            cmd.Parameters.Add(new OracleParameter("lc7a37a", OracleDbType.Date) { Value = (object)m.Lc7a37a ?? DBNull.Value });
-            cmd.Parameters.Add(new OracleParameter("gazette20A", OracleDbType.Date) { Value = (object)m.Gazette20A ?? DBNull.Value });
-            cmd.Parameters.Add(new OracleParameter("paper20A", OracleDbType.Date) { Value = (object)m.Paper20A ?? DBNull.Value });
-            cmd.Parameters.Add(new OracleParameter("form20B", OracleDbType.Date) { Value = (object)m.Form20B ?? DBNull.Value });
-            cmd.Parameters.Add(new OracleParameter("form20C", OracleDbType.Date) { Value = (object)m.Form20C ?? DBNull.Value });
-            cmd.Parameters.Add(new OracleParameter("form20D", OracleDbType.Date) { Value = (object)m.Form20D ?? DBNull.Value });
-            cmd.Parameters.Add(new OracleParameter("gazette20E", OracleDbType.Date) { Value = (object)m.Gazette20E ?? DBNull.Value });
-            cmd.Parameters.Add(new OracleParameter("paper20E", OracleDbType.Date) { Value = (object)m.Paper20E ?? DBNull.Value });
-            cmd.Parameters.Add(new OracleParameter("form20F", OracleDbType.Date) { Value = (object)m.Form20F ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("lc7a37a", OracleDbType.Varchar2) { Value = (object)m.Lc7a37a ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("gazette20A", OracleDbType.Varchar2) { Value = (object)m.Gazette20A ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("paper20A", OracleDbType.Varchar2) { Value = (object)m.Paper20A ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("form20B", OracleDbType.Varchar2) { Value = (object)m.Form20B ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("form20C", OracleDbType.Varchar2) { Value = (object)m.Form20C ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("form20D", OracleDbType.Varchar2) { Value = (object)m.Form20D ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("gazette20E", OracleDbType.Varchar2) { Value = (object)m.Gazette20E ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("paper20E", OracleDbType.Varchar2) { Value = (object)m.Paper20E ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("form20F", OracleDbType.Varchar2) { Value = (object)m.Form20F ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("remark", OracleDbType.Varchar2) { Value = (object)m.Remark ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("stStatus", OracleDbType.Varchar2) { Value = (object)m.StStatus ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("trdStatus", OracleDbType.Varchar2) { Value = (object)m.TrdStatus ?? DBNull.Value });
@@ -231,7 +236,8 @@ namespace RoadSafetyProject.Data
             cmd.Parameters.Add(new OracleParameter("substructureStatus", OracleDbType.Varchar2) { Value = (object)m.SubstructureStatus ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("superStructureStatus", OracleDbType.Varchar2) { Value = (object)m.SuperStructureStatus ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("commissioningStatus", OracleDbType.Varchar2) { Value = (object)m.CommissioningStatus ?? DBNull.Value });
-            cmd.Parameters.Add(new OracleParameter("gadExit", OracleDbType.Varchar2) { Value = (object)NormalizeYN(m.GadExit) ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("gadExit", OracleDbType.Varchar2) { Value = (object)m.GadExit ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("gadExitRemark", OracleDbType.Varchar2) { Value = (object)m.GadExitRemark ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("designStatus", OracleDbType.Varchar2) { Value = (object)m.DesignStatus ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("exitNo", OracleDbType.Varchar2) { Value = (object)m.ExitNo ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("noExit", OracleDbType.Varchar2) { Value = (object)m.NoExit ?? DBNull.Value });
@@ -240,44 +246,40 @@ namespace RoadSafetyProject.Data
             cmd.Parameters.Add(new OracleParameter("soa", OracleDbType.Varchar2) { Value = (object)m.Soa ?? DBNull.Value });
         }
 
-        private static string NormalizeYN(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value)) return null;
-            return value.Trim().ToUpperInvariant().StartsWith("Y") ? "Y" : "N";
-        }
-
         private static RspMaster Map(IDataReader r)
         {
             return new RspMaster
             {
                 Id = GetInt(r, "ID") ?? 0,
                 SrNo = GetInt(r, "SR_NO"),
-                YearOfSanction = GetInt(r, "YEAR_OF_SANCTION"),
+                YearOfSanction = GetString(r, "YEAR_OF_SANCTION"),
                 LcNo = GetString(r, "LC_NO"),
                 LocationKm = GetString(r, "LOCATION_KM"),
                 Division = GetString(r, "DIVISION"),
                 LcStatus = GetString(r, "LC_STATUS"),
                 SectionName = GetString(r, "SECTION_NAME"),
                 SpanArrangement = GetString(r, "SPAN_ARRANGEMENT"),
-                SkewAngle = GetDecimal(r, "SKEW_ANGLE"),
+                SkewAngle = GetString(r, "SKEW_ANGLE"),
                 DistanceExistingLc = GetString(r, "DISTANCE_EXISTING_LC"),
                 StateAuthorityApproval = GetString(r, "STATE_AUTHORITY_APPROVAL"),
                 DprConsultancy = GetString(r, "DPR_CONSULTANCY"),
                 ExecutiveAgency = GetString(r, "EXECUTIVE_AGENCY"),
                 Gad = GetString(r, "GAD"),
+                GadRemark = GetString(r, "GAD_REMARK"),
                 CheckedReceived = GetString(r, "CHECKED_RECEIVED"),
-                SanctionedCont = GetDecimal(r, "SANCTIONED_CONT"),
-                SanctionedDe = GetDecimal(r, "SANCTIONED_DE"),
+                CheckedReceivedRemark = GetString(r, "CHECKED_RECEIVED_REMARK"),
+                SanctionedCont = GetString(r, "SANCTIONED_CONT"),
+                SanctionedDe = GetString(r, "SANCTIONED_DE"),
                 TenderStatus = GetString(r, "TENDER_STATUS"),
-                Lc7a37a = GetDate(r, "LC_7A_37A"),
-                Gazette20A = GetDate(r, "GAZETTE_20A"),
-                Paper20A = GetDate(r, "PAPER_20A"),
-                Form20B = GetDate(r, "FORM_20B"),
-                Form20C = GetDate(r, "FORM_20C"),
-                Form20D = GetDate(r, "FORM_20D"),
-                Gazette20E = GetDate(r, "GAZETTE_20E"),
-                Paper20E = GetDate(r, "PAPER_20E"),
-                Form20F = GetDate(r, "FORM_20F"),
+                Lc7a37a = GetString(r, "LC_7A_37A"),
+                Gazette20A = GetString(r, "GAZETTE_20A"),
+                Paper20A = GetString(r, "PAPER_20A"),
+                Form20B = GetString(r, "FORM_20B"),
+                Form20C = GetString(r, "FORM_20C"),
+                Form20D = GetString(r, "FORM_20D"),
+                Gazette20E = GetString(r, "GAZETTE_20E"),
+                Paper20E = GetString(r, "PAPER_20E"),
+                Form20F = GetString(r, "FORM_20F"),
                 Remark = GetString(r, "REMARK"),
                 StStatus = GetString(r, "ST_STATUS"),
                 TrdStatus = GetString(r, "TRD_STATUS"),
@@ -286,6 +288,7 @@ namespace RoadSafetyProject.Data
                 SuperStructureStatus = GetString(r, "SUPER_STRUCTURE_STATUS"),
                 CommissioningStatus = GetString(r, "COMMISSIONING_STATUS"),
                 GadExit = GetString(r, "GAD_EXIT"),
+                GadExitRemark = GetString(r, "EXITS_GAD_REMARK"),
                 DesignStatus = GetString(r, "DESIGN_STATUS"),
                 ExitNo = GetString(r, "EXIT_NO"),
                 NoExit = GetString(r, "NO_EXIT"),
@@ -305,18 +308,6 @@ namespace RoadSafetyProject.Data
         {
             int i = r.GetOrdinal(col);
             return r.IsDBNull(i) ? (int?)null : Convert.ToInt32(r.GetValue(i));
-        }
-
-        private static decimal? GetDecimal(IDataReader r, string col)
-        {
-            int i = r.GetOrdinal(col);
-            return r.IsDBNull(i) ? (decimal?)null : Convert.ToDecimal(r.GetValue(i));
-        }
-
-        private static DateTime? GetDate(IDataReader r, string col)
-        {
-            int i = r.GetOrdinal(col);
-            return r.IsDBNull(i) ? (DateTime?)null : r.GetDateTime(i);
         }
 
         public List<DivisionCount> GetDivisionCounts()
