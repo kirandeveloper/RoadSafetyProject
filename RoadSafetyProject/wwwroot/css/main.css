@@ -423,6 +423,11 @@ p{
 
 /* table header sticky */
 
+#recordsTabsContent h6{
+	font-size:1.5rem;
+	margin-bottom:20px !important;
+}
+
 .vertical-middle {
 	vertical-align: middle;
 }
@@ -1323,10 +1328,11 @@ iframe {
 .rob-status{
   text-align:center;
   font-family:'IBM Plex Mono', monospace;
-  font-size:.8rem;
+  font-size:1rem;
   color:var(--muted);
   margin-top:10px;
   min-height:1.2em;
+  margin-bottom:20px;
 }
 .rob-status.err{ color:var(--danger); }
 .rob-status.ok{ color:var(--ok); }
@@ -1557,7 +1563,11 @@ iframe {
 	color: #6c757d;
 	font-weight: 600;
 }
-
+.lc-pagination-info {
+	font-family: 'Poppins-Medium';
+	font-size: 1rem;
+	margin:10px 0px;
+}
 
 
 

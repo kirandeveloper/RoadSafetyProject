@@ -128,7 +128,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
     <script>
-        (function () {
+        (function() {
             const statusEl = document.getElementById('recordsStatus');
 
             function setStatus(message, isError) {
@@ -137,17 +137,9 @@
                 statusEl.className = 'mb-2 ' + (isError ? 'text-danger' : 'text-success');
             }
 
-            // CHAR(1) Y/N columns (GAD, Checked & Received) rendered as words.
+            // CHAR(1) Y/N columns (GAD, Checked & Received) rendered as words; passes
+            // full "Yes"/"No" text straight through unchanged.
             function yn(v) { return v === 'Y' ? 'Yes' : (v === 'N' ? 'No' : (v || '')); }
-
-            // Date columns come over as ISO strings (or null); render as DD-MM-YYYY.
-            function dt(v) {
-                if (!v) return '';
-                const d = new Date(v);
-                if (isNaN(d.getTime())) return '';
-                const pad = n => String(n).padStart(2, '0');
-                return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
-            }
 
             function text(v) { return v == null ? '' : v; }
 
@@ -177,15 +169,15 @@
                     { data: 'sanctionedCont', title: 'Sanctioned Cont (Cr)', render: text },
                     { data: 'sanctionedDe', title: 'Sanctioned DE (Cr)', render: text },
                     { data: 'tenderStatus', title: 'Status of Tender', render: text },
-                    { data: 'lc7a37a', title: '7A / 37A', render: (v, type) => type === 'display' ? dt(v) : v },
-                    { data: 'gazette20A', title: '20A Gazette', render: (v, type) => type === 'display' ? dt(v) : v },
-                    { data: 'paper20A', title: '20A Paper', render: (v, type) => type === 'display' ? dt(v) : v },
-                    { data: 'form20B', title: '20B', render: (v, type) => type === 'display' ? dt(v) : v },
-                    { data: 'form20C', title: '20C', render: (v, type) => type === 'display' ? dt(v) : v },
-                    { data: 'form20D', title: '20D', render: (v, type) => type === 'display' ? dt(v) : v },
-                    { data: 'gazette20E', title: '20E Gazette', render: (v, type) => type === 'display' ? dt(v) : v },
-                    { data: 'paper20E', title: '20E Paper', render: (v, type) => type === 'display' ? dt(v) : v },
-                    { data: 'form20F', title: '20F', render: (v, type) => type === 'display' ? dt(v) : v },
+                    { data: 'lc7a37a', title: '7A / 37A', render: text },
+                    { data: 'gazette20A', title: '20A Gazette', render: text },
+                    { data: 'paper20A', title: '20A Paper', render: text },
+                    { data: 'form20B', title: '20B', render: text },
+                    { data: 'form20C', title: '20C', render: text },
+                    { data: 'form20D', title: '20D', render: text },
+                    { data: 'gazette20E', title: '20E Gazette', render: text },
+                    { data: 'paper20E', title: '20E Paper', render: text },
+                    { data: 'form20F', title: '20F', render: text },
                     { data: 'remark', title: 'Land Remark', render: text },
                     { data: 'stStatus', title: 'S & T', render: text },
                     { data: 'trdStatus', title: 'TRD', render: text },
@@ -272,11 +264,11 @@
                 return cfg ? cfg.key : 'Other';
             }
 
-            $(document).ready(function () {
+            $(document).ready(function() {
                 const commonOptions = {
                     scrollX: true,
                     pageLength: 10,
-                    lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+                    lengthMenu: [10, 25, 50, 100],
                     dom: "<'row mb-2'<'col-sm-6'B><'col-sm-6'f>>rtip"
                 };
 
@@ -308,7 +300,7 @@
 
                 // Level 2 (division pills within a status tab)
                 document.querySelectorAll('[id^="divTabs-"] button[data-bs-toggle="pill"]').forEach(btn => {
-                    btn.addEventListener('shown.bs.tab', function (e) {
+                    btn.addEventListener('shown.bs.tab', function(e) {
                         adjustPane(e.target.getAttribute('data-bs-target'));
                     });
                 });
@@ -316,7 +308,7 @@
                 // Level 1 (Sanction / UnSanction): adjust whichever division pane is
                 // currently active inside the status tab that just became visible.
                 document.querySelectorAll('#statusTabs button[data-bs-toggle="tab"]').forEach(btn => {
-                    btn.addEventListener('shown.bs.tab', function (e) {
+                    btn.addEventListener('shown.bs.tab', function(e) {
                         const statusPaneId = e.target.getAttribute('data-bs-target');
                         const activePill = document.querySelector(statusPaneId + ' [data-bs-toggle="pill"].active');
                         if (activePill) adjustPane(activePill.getAttribute('data-bs-target'));
@@ -328,7 +320,7 @@
                 const lcNoSearch = document.getElementById('searchLcNo');
                 if (lcNoSearch) {
                     let searchTimer;
-                    lcNoSearch.addEventListener('input', function () {
+                    lcNoSearch.addEventListener('input', function() {
                         const value = this.value;
                         clearTimeout(searchTimer);
                         searchTimer = setTimeout(() => {

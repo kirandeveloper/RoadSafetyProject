@@ -144,7 +144,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script>
-        (function () {
+        (function() {
             // Saved LC Records grid — merged from addnewlc.cshtml.
             // NOTE: the Add/Edit form itself lives on the "addnewlc" page, so the
             // Edit button here just takes the user there instead of populating a
@@ -276,7 +276,7 @@
                 win.document.write(popupHtml);
                 win.document.close();
 
-                setTimeout(function () { win.print(); }, 300);
+                setTimeout(function() { win.print(); }, 300);
             }
 
             function esc(v) {
@@ -287,13 +287,18 @@
 
             function actionsCell(id) {
                 return `<td>
-                                            <button class="btn btn-sm edit-btn" data-id="${id}"><i class="bi bi-pencil"></i></button>
-                                            <button class="btn btn-sm delete-btn" data-id="${id}"><i class="bi bi-trash"></i></button>
-                               </td>`;
+                                                    <button class="btn btn-sm edit-btn" data-id="${id}"><i class="bi bi-pencil"></i></button>
+                                                    <button class="btn btn-sm delete-btn" data-id="${id}"><i class="bi bi-trash"></i></button>
+                                       </td>`;
             }
 
-            function yn(v) { return v === 'Y' ? 'Yes' : (v === 'N' ? 'No' : ''); }
-            function dt(v) { return v ? new Date(v).toLocaleDateString() : ''; }
+            function yn(v) {
+                if (!v) return '';
+                const s = v.toString().trim().toUpperCase();
+                if (s === 'Y' || s === 'YES') return 'Yes';
+                if (s === 'N' || s === 'NO') return 'No';
+                return v; // anything else (shouldn't normally happen) — show as-is
+            }
 
             const tabColumns = {
                 basic: [
@@ -312,11 +317,11 @@
                 ],
                 land: [
                     { key: 'id', label: 'ID' }, { key: 'lcNo', label: 'LC No.' },
-                    { key: 'lc7a37a', label: '7A/37A', fmt: dt }, { key: 'gazette20A', label: '20A Gazette', fmt: dt },
-                    { key: 'paper20A', label: '20A Paper', fmt: dt }, { key: 'form20B', label: '20B', fmt: dt },
-                    { key: 'form20C', label: '20C', fmt: dt }, { key: 'form20D', label: '20D', fmt: dt },
-                    { key: 'gazette20E', label: '20E Gazette', fmt: dt }, { key: 'paper20E', label: '20E Paper', fmt: dt },
-                    { key: 'form20F', label: '20F', fmt: dt }, { key: 'remark', label: 'Remark' }
+                    { key: 'lc7a37a', label: '7A/37A' }, { key: 'gazette20A', label: '20A Gazette' },
+                    { key: 'paper20A', label: '20A Paper' }, { key: 'form20B', label: '20B' },
+                    { key: 'form20C', label: '20C' }, { key: 'form20D', label: '20D' },
+                    { key: 'gazette20E', label: '20E Gazette' }, { key: 'paper20E', label: '20E Paper' },
+                    { key: 'form20F', label: '20F' }, { key: 'remark', label: 'Remark' }
                 ],
                 utility: [
                     { key: 'id', label: 'ID' }, { key: 'lcNo', label: 'LC No.' },
@@ -507,70 +512,70 @@
                 const unsanctionFile = sanitizeFilename(`${divisionName}_${tabLabel}_UnSanction`);
 
                 const toolbar = (tableId, title, filename) => `
-                                                                <div class="d-flex justify-content-end gap-2 mb-2">
-                                                                    <button type="button" class="btn btn-sm export-print-btn"
-                                                                                    data-table-id="${tableId}" data-title="${esc(title)}"><i class="bi bi-printer-fill"></i></button>
-                                                                    <button type="button" class="btn btn-sm export-excel-btn"
-                                                                                    data-table-id="${tableId}" data-filename="${esc(filename)}"><i class="bi bi-file-earmark-excel-fill"></i></button>
-                                                                    <button type="button" class="btn btn-sm export-pdf-btn"
-                                                                                    data-table-id="${tableId}" data-title="${esc(title)}" data-filename="${esc(filename)}"><i class="bi bi-file-earmark-pdf-fill"></i></button>
-                                                                </div>`;
+                                                                        <div class="d-flex justify-content-end gap-2 mb-2">
+                                                                            <button type="button" class="btn btn-sm export-print-btn"
+                                                                                            data-table-id="${tableId}" data-title="${esc(title)}"><i class="bi bi-printer-fill"></i></button>
+                                                                            <button type="button" class="btn btn-sm export-excel-btn"
+                                                                                            data-table-id="${tableId}" data-filename="${esc(filename)}"><i class="bi bi-file-earmark-excel-fill"></i></button>
+                                                                            <button type="button" class="btn btn-sm export-pdf-btn"
+                                                                                            data-table-id="${tableId}" data-title="${esc(title)}" data-filename="${esc(filename)}"><i class="bi bi-file-earmark-pdf-fill"></i></button>
+                                                                        </div>`;
 
                 return `
-                                                                        <div class="mb-4">
-                                                                                           <div class="row body-basic-header">
-                                                                              <div class="col-md-6 col-6">
-                                                                                   <h5 class="fw-bold mb-2">${esc(divisionName)} <span class="text-muted fw-normal">(${rows.length} record${rows.length === 1 ? '' : 's'})</span></h5>
-                                                                              </div>
-                                                                              <div class="col-md-6 col-6">
-                                                                                         <ul class="nav nav-tabs mb-3 justify-content-end" id="${navId}" role="tablist">
-                                                                                       <li class="nav-item">
-                                                                                            <button class="nav-link sanction-tab active"
-                                                                                                    data-bs-toggle="tab"
-                                                                                                    data-bs-target="#${sanctionTabId}"
-                                                                                                    type="button">
-                                                                                                Sanction (${sanctionRows.length})
-                                                                                            </button>
-                                                                                        </li>
+                                                                                <div class="mb-4">
+                                                                                                   <div class="row body-basic-header">
+                                                                                      <div class="col-md-6 col-6">
+                                                                                           <h5 class="fw-bold mb-2">${esc(divisionName)} <span class="text-muted fw-normal">(${rows.length} record${rows.length === 1 ? '' : 's'})</span></h5>
+                                                                                      </div>
+                                                                                      <div class="col-md-6 col-6">
+                                                                                                 <ul class="nav nav-tabs mb-3 justify-content-end" id="${navId}" role="tablist">
+                                                                                               <li class="nav-item">
+                                                                                                    <button class="nav-link sanction-tab active"
+                                                                                                            data-bs-toggle="tab"
+                                                                                                            data-bs-target="#${sanctionTabId}"
+                                                                                                            type="button">
+                                                                                                        Sanction (${sanctionRows.length})
+                                                                                                    </button>
+                                                                                                </li>
 
-                                                                                        <li class="nav-item">
-                                                                                            <button class="nav-link unsanction-tab"
-                                                                                                    data-bs-toggle="tab"
-                                                                                                    data-bs-target="#${unsanctionTabId}"
-                                                                                                    type="button">
-                                                                                                UnSanction (${unsanctionRows.length})
-                                                                                            </button>
-                                                                                        </li>
-                                                                                </ul>
-                                                                              </div>
-                                                                           </div>
+                                                                                                <li class="nav-item">
+                                                                                                    <button class="nav-link unsanction-tab"
+                                                                                                            data-bs-toggle="tab"
+                                                                                                            data-bs-target="#${unsanctionTabId}"
+                                                                                                            type="button">
+                                                                                                        UnSanction (${unsanctionRows.length})
+                                                                                                    </button>
+                                                                                                </li>
+                                                                                        </ul>
+                                                                                      </div>
+                                                                                   </div>
 
-                                                                            <div class="table-responsive">
+                                                                                    <div class="table-responsive">
 
                                            
-                                                    <div class="tab-content">
-                                                    <div class="tab-pane fade show active" id="${sanctionTabId}">
-                                                            <h3 class="pt-4 ps-3 text-success">Status of Sanction work for LC elimination under construction/Road Saftey Project</h3>
-                                                    ${toolbar(sanctionTableId, sanctionTitle, sanctionFile)}
-                                                    <table id="${sanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
-                                                                                    <thead><tr>${headerCells}</tr></thead>
-                                                                                    <tbody>${buildRowsHtml(sanctionRows, columns)}</tbody>
-                                                                                </table>
-                                                                                <div id="${sanctionTableId}-pagination" class="table-pagination"></div>
-                                                    </div>
-                                                    <div class="tab-pane fade" id="${unsanctionTabId}">
-                                                            <h3 class="pt-4 ps-3 text-danger">Status of UnSanction work ROB assigned to RSP</h3>
-                                                    ${toolbar(unsanctionTableId, unsanctionTitle, unsanctionFile)}
-                                                    <table id="${unsanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
-                                                                                    <thead><tr>${headerCells}</tr></thead>
-                                                                                    <tbody>${buildRowsHtml(unsanctionRows, columns)}</tbody>
-                                                                                </table>
-                                                                                <div id="${unsanctionTableId}-pagination" class="table-pagination"></div>
-                                                    </div>
-                                                    </div>
+                                                            <div class="tab-content">
+                                                            <div class="tab-pane fade show active" id="${sanctionTabId}">
+                                                                    <h3 class="pt-4 ps-3 text-success">Status of Sanction work for LC elimination under construction/Road Saftey Project</h3>
+                                                            ${toolbar(sanctionTableId, sanctionTitle, sanctionFile)}
+                                                            <table id="${sanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
+                                                                                            <thead><tr>${headerCells}</tr></thead>
+                                                                                            <tbody>${buildRowsHtml(sanctionRows, columns)}</tbody>
+                                                                                        </table>
+                                                                                        <div id="${sanctionTableId}-pagination" class="table-pagination"></div>
+                                                            </div>
+                                                            <div class="tab-pane fade" id="${unsanctionTabId}">
+                                                                    <h3 class="pt-4 ps-3 text-danger">Status of UnSanction work ROB assigned to RSP</h3>
+                                                            ${toolbar(unsanctionTableId, unsanctionTitle, unsanctionFile)}
+                                                            <table id="${unsanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
+                                                                                            <thead><tr>${headerCells}</tr></thead>
+                                                                                            <tbody>${buildRowsHtml(unsanctionRows, columns)}</tbody>
+                                                                                        </table>
+                                                                                        <div id="${unsanctionTableId}-pagination" class="table-pagination"></div>
+                                                            </div>
+                                                            </div>
 
-                                                                            </div>
-                                                                        </div>`;
+                                                                                    </div>
+                                                                                </div>`;
             }
 
             function renderTabs(data) {
@@ -617,7 +622,7 @@
             const recordsTabs = document.getElementById("recordsTabsContent");
 
             if (recordsTabs) {
-                recordsTabs.addEventListener("click", async function (e) {
+                recordsTabs.addEventListener("click", async function(e) {
 
                     // Export buttons
                     const exportBtn = e.target.closest(".export-print-btn, .export-excel-btn, .export-pdf-btn");
