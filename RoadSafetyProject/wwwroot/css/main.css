@@ -178,7 +178,7 @@ p{
 	font-family: 'Poppins-Medium';
 	font-size: 1.6rem;
 	color: #212529;
-	margin-bottom: 10px;
+	margin-bottom: 13px;
 }
 
 .lc-summery ol li {
@@ -439,7 +439,7 @@ p{
 }
 
 .stats-box {
-	padding: 27px 15px;
+	padding: 15px 15px;
 	border-radius: 10px;
 	color: #14315c;
 	border: 2px solid #14315c;

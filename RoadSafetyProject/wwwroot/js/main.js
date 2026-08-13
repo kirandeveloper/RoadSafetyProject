@@ -828,7 +828,7 @@ viewerImg.addEventListener("click", function (e) {
    Zoom Using Mouse Wheel
 ============================ */
 
-let zoom = 1;
+/*let zoom = 1;*/
 
 viewerImg.addEventListener("wheel", function (e) {
 

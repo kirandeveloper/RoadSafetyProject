@@ -315,16 +315,91 @@
                     });
                 });
 
-                // Dedicated "Search by LC No" box, applied to every status/division table
-                // at once so the filter holds no matter which tab is currently active.
+                // Search by LC No. Search all loaded records, automatically open the
+                // matching Status tab and Division pill, and show the matching row.
                 const lcNoSearch = document.getElementById('searchLcNo');
+                let allRecords = [];
+                let searchTimer;
+
+                function activateMatchingTabs(row) {
+                    if (!row) return;
+
+                    const statusKey = isUnSanctionRow(row) ? 'unsanction' : 'sanction';
+                    const divKey = divisionKeyFor(row);
+
+                    const statusButton = document.getElementById(`tab-${statusKey}-btn`);
+                    if (statusButton && window.bootstrap && bootstrap.Tab) {
+                        bootstrap.Tab.getOrCreateInstance(statusButton).show();
+                    } else if (statusButton) {
+                        statusButton.click();
+                    }
+
+                    // The division pills are inside the status pane. Bootstrap needs the
+                    // status tab to be shown first, then the division pill can be activated.
+                    setTimeout(function() {
+                        const divisionButton = document.querySelector(
+                            `#divTabs-${statusKey} button[data-bs-target="#pane-${statusKey}-${divKey}"]`
+                        );
+
+                        if (divisionButton && window.bootstrap && bootstrap.Tab) {
+                            bootstrap.Tab.getOrCreateInstance(divisionButton).show();
+                        } else if (divisionButton) {
+                            divisionButton.click();
+                        }
+
+                        const tableKey = `${statusKey}-${divKey}`;
+                        const table = tables[tableKey];
+
+                        if (table) {
+                            // Filter only the matching LC number in the selected table.
+                            table.column('lcNo:name').search((row.lcNo || '').toString(), false, true).draw();
+                            table.page(0).draw('page');
+
+                            setTimeout(function() {
+                                table.columns.adjust();
+                            }, 100);
+                        }
+                    }, 100);
+                }
+
+                function clearAllLcSearch() {
+                    Object.values(tables).forEach(function(table) {
+                        table.column('lcNo:name').search('').draw();
+                    });
+                }
+
                 if (lcNoSearch) {
-                    let searchTimer;
                     lcNoSearch.addEventListener('input', function() {
-                        const value = this.value;
+                        const value = this.value.trim();
+
                         clearTimeout(searchTimer);
-                        searchTimer = setTimeout(() => {
-                            Object.values(tables).forEach(t => t.column('lcNo:name').search(value).draw());
+
+                        searchTimer = setTimeout(function() {
+                            if (!value) {
+                                clearAllLcSearch();
+                                return;
+                            }
+
+                            const searchValue = value.toLowerCase();
+
+                            // Partial match is supported, e.g. entering 41 will find LC 41.
+                            const match = allRecords.find(function(row) {
+                                return (row.lcNo || '').toString().trim().toLowerCase().includes(searchValue);
+                            });
+
+                            // Apply the search to every table so the search remains active
+                            // if the user changes tabs after searching.
+                            Object.keys(tables).forEach(function(tableKey) {
+                                const table = tables[tableKey];
+                                table.column('lcNo:name').search(value, false, true).draw();
+                            });
+
+                            if (match) {
+                                activateMatchingTabs(match);
+                                setStatus('LC No. "' + match.lcNo + '" found.', false);
+                            } else {
+                                setStatus('No LC found for "' + value + '".', true);
+                            }
                         }, 200);
                     });
                 }
@@ -340,6 +415,8 @@
                             }
 
                             const data = json.data || [];
+                            allRecords = data;
+
                             const byStatus = {
                                 sanction: data.filter(r => !isUnSanctionRow(r)),
                                 unsanction: data.filter(isUnSanctionRow)

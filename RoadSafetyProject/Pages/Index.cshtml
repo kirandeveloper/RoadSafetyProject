@@ -23,7 +23,7 @@
                 </div>
             </div>
             <div class="stats-box bg-light lc-summery">
-                <h3>Summery Division Wise LC</h3>
+                <h3>Summery Division Wise LC, Total LC: <span id="totalLC">0</span></h3>
                 <div class="row">
                     <div class="col-md-5 col-12 lc-divisions">
                         <h5>Sanctioned</h5>
@@ -33,6 +33,7 @@
                             <li><span>Nagpur (NGP)</span><span id="sanNGP">0</span></li>
                             <li><span>Pune (PA)</span><span id="sanPune">0</span></li>
                             <li><span>Solapur (SUR)</span><span id="sanSUR">0</span></li>
+                            <li class="fw-bold border-top pt-1 mt-1"><span>Total Sanctioned</span><span id="totalSanctioned">0</span></li>
                         </ul>
                     </div>
                     <div class="col-md-1">&nbsp;</div>
@@ -44,6 +45,7 @@
                             <li><span>Nagpur (NGP)</span><span id="unsNGP">0</span></li>
                             <li><span>Pune (PA)</span><span id="unsPune">0</span></li>
                             <li><span>Solapur (SUR)</span><span id="unsSUR">0</span></li>
+                            <li class="fw-bold border-top pt-1 mt-1"><span>Total UnSanctioned</span><span id="totalUnSanctioned">0</span></li>
                         </ul>
                     </div>
                 </div>
@@ -187,12 +189,24 @@
                     const json = await res.json();
                     if (!json.success) return;
 
+                    let totalSanctioned = 0;
+                    let totalUnSanctioned = 0;
+
                     (json.data || []).forEach(d => {
                         const sanEl = document.getElementById('san' + d.key);
                         const unsEl = document.getElementById('uns' + d.key);
                         if (sanEl) sanEl.textContent = d.sanctioned;
                         if (unsEl) unsEl.textContent = d.unSanctioned;
+                        totalSanctioned += d.sanctioned || 0;
+                        totalUnSanctioned += d.unSanctioned || 0;
                     });
+
+                    const totalSanEl = document.getElementById('totalSanctioned');
+                    const totalUnsEl = document.getElementById('totalUnSanctioned');
+                    const totalLcEl = document.getElementById('totalLC');
+                    if (totalSanEl) totalSanEl.textContent = totalSanctioned;
+                    if (totalUnsEl) totalUnsEl.textContent = totalUnSanctioned;
+                    if (totalLcEl) totalLcEl.textContent = totalSanctioned + totalUnSanctioned;
                 } catch (err) {
                     console.error('Failed to load division summary:', err);
                 }
