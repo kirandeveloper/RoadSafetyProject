@@ -52,6 +52,37 @@
                             <div class="row">
                                 <div class="col-md-3 mb-3">
                                     <div class="form-floating">
+                                        <input type="text" class="form-control" id="projectName" name="projectName" placeholder=" " required />
+                                        <label for="projectName" class="req-label">Project Name</label>
+                                    </div>
+                                    <div class="invalid-feedback">Project Name is required.</div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="nameOfWorks" name="nameOfWorks" placeholder=" " />
+                                        <label for="nameOfWorks">Name of Works</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="roadCategory" name="roadCategory" placeholder=" " />
+                                        <label for="roadCategory">Road Category</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="robRubWork" name="robRubWork" placeholder=" " />
+                                        <label for="robRubWork">Work of ROB/RUB</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="statusOfWorks" name="statusOfWorks" placeholder=" " />
+                                        <label for="statusOfWorks">Status of Works</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="form-floating">
                                         <input type="text" class="form-control" id="division" name="division" placeholder=" " required />
                                         <label for="division" class="req-label">Enter Division</label>
                                     </div>
@@ -541,7 +572,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script>
-        (function () {
+        (function() {
             const form = document.getElementById('robForm');
             const status = document.getElementById('formStatus');
             const resetBtn = document.getElementById('resetBtn');
@@ -680,7 +711,7 @@
                 win.document.write(popupHtml);
                 win.document.close();
 
-                setTimeout(function () {
+                setTimeout(function() {
 
                     win.print();
 
@@ -696,9 +727,9 @@
 
             function actionsCell(id) {
                 return `<td>
-                                                    <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${id}">Edit</button>
-                                                    <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${id}">Delete</button>
-                                                </td>`;
+                                                                            <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${id}">Edit</button>
+                                                                            <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${id}">Delete</button>
+                                                                        </td>`;
             }
 
             function yn(v) { return v === 'Y' ? 'Yes' : (v === 'N' ? 'No' : ''); }
@@ -724,6 +755,11 @@
                 const isUnSanction = (record.lcStatus || '').toString().trim().toLowerCase() === 'unsanction';
                 document.getElementById('statusSanction').checked = !isUnSanction;
                 document.getElementById('statusUnSanction').checked = isUnSanction;
+                form.querySelector('#projectName').value = record.projectName || '';
+                form.querySelector('#nameOfWorks').value = record.nameOfWorks || '';
+                form.querySelector('#roadCategory').value = record.roadCategory || '';
+                form.querySelector('#robRubWork').value = record.robRubWork || '';
+                form.querySelector('#statusOfWorks').value = record.statusOfWorks || '';
                 form.querySelector('#division').value = record.division || '';
                 form.querySelector('#yearSanction').value = record.yearOfSanction || '';
                 form.querySelector('#lcNo').value = record.lcNo || '';
@@ -773,11 +809,33 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
+            // Fetches a single record by id and loads it into the form — shared by the
+            // grid's own Edit button and by the "?id=" auto-load below (used when this
+            // page is opened via an Edit link from elsewhere, e.g. the Index page's grid).
+            async function loadRecordIntoForm(id) {
+                try {
+                    const response = await fetch(`?handler=Item&id=${id}`);
+                    if (!response.ok) throw new Error("Unable to load record.");
+
+                    const json = await response.json();
+                    if (json.success) {
+                        populateForm(json.data);
+                    } else {
+                        setStatus(json.message || "Record not found.", true);
+                    }
+                } catch (err) {
+                    setStatus(err.message, true);
+                }
+            }
+
             // Column definitions per tab: key = field on the record, label = header text.
             // 'division' itself is left out of each table body since it's now the grouping/heading.
             const tabColumns = {
                 basic: [
-                    { key: 'id', label: 'ID' }, { key: 'yearOfSanction', label: 'Year' },
+                    { key: 'id', label: 'ID' }, { key: 'projectName', label: 'Project Name' },
+                    { key: 'nameOfWorks', label: 'Name of Works' }, { key: 'roadCategory', label: 'Road Category' },
+                    { key: 'robRubWork', label: 'Work of ROB/RUB' }, { key: 'statusOfWorks', label: 'Status of Works' },
+                    { key: 'yearOfSanction', label: 'Year' },
                     { key: 'lcNo', label: 'LC No.' }, { key: 'locationKm', label: 'Location Km' },
                     { key: 'sectionName', label: 'Section' }, { key: 'spanArrangement', label: 'Span Arrangement' },
                     { key: 'skewAngle', label: 'Skew Angle' }, { key: 'distanceExistingLc', label: 'Distance from Existing LC' },
@@ -860,45 +918,45 @@
                 const unsanctionFile = sanitizeFilename(`${divisionName}_${tabLabel}_UnSanction`);
 
                 const toolbar = (tableId, title, filename) => `
-                                    <div class="d-flex justify-content-end gap-2 mb-2">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary export-print-btn"
-                                                data-table-id="${tableId}" data-title="${esc(title)}">Print</button>
-                                        <button type="button" class="btn btn-sm btn-outline-success export-excel-btn"
-                                                data-table-id="${tableId}" data-filename="${esc(filename)}">Excel</button>
-                                        <button type="button" class="btn btn-sm btn-outline-danger export-pdf-btn"
-                                                data-table-id="${tableId}" data-title="${esc(title)}" data-filename="${esc(filename)}">PDF</button>
-                                    </div>`;
+                                                            <div class="d-flex justify-content-end gap-2 mb-2">
+                                                                <button type="button" class="btn btn-sm btn-outline-secondary export-print-btn"
+                                                                        data-table-id="${tableId}" data-title="${esc(title)}">Print</button>
+                                                                <button type="button" class="btn btn-sm btn-outline-success export-excel-btn"
+                                                                        data-table-id="${tableId}" data-filename="${esc(filename)}">Excel</button>
+                                                                <button type="button" class="btn btn-sm btn-outline-danger export-pdf-btn"
+                                                                        data-table-id="${tableId}" data-title="${esc(title)}" data-filename="${esc(filename)}">PDF</button>
+                                                            </div>`;
 
                 return `
-                                            <div class="mb-4">
-                                                <h6 class="fw-bold mb-2">${esc(divisionName)} <span class="text-muted fw-normal">(${rows.length} record${rows.length === 1 ? '' : 's'})</span></h6>
-                                                <div class="table-responsive">
+                                                                    <div class="mb-4">
+                                                                        <h6 class="fw-bold mb-2">${esc(divisionName)} <span class="text-muted fw-normal">(${rows.length} record${rows.length === 1 ? '' : 's'})</span></h6>
+                                                                        <div class="table-responsive">
 
-                        <ul class="nav nav-tabs mb-3" id="${navId}" role="tablist">
-                        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#${sanctionTabId}" type="button">Sanction (${sanctionRows.length})</button></li>
-                        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#${unsanctionTabId}" type="button">UnSanction (${unsanctionRows.length})</button></li>
-                        </ul>
-                        <div class="tab-content">
-                        <div class="tab-pane fade show active" id="${sanctionTabId}">
-                        ${toolbar(sanctionTableId, sanctionTitle, sanctionFile)}
-                        <table id="${sanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
-                                                        <thead><tr>${headerCells}</tr></thead>
-                                                        <tbody>${buildRowsHtml(sanctionRows, columns)}</tbody>
-                                                    </table>
-                        <div id="${sanctionTableId}-pagination" class="lc-pagination"></div>
-                        </div>
-                        <div class="tab-pane fade" id="${unsanctionTabId}">
-                        ${toolbar(unsanctionTableId, unsanctionTitle, unsanctionFile)}
-                        <table id="${unsanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
-                                                        <thead><tr>${headerCells}</tr></thead>
-                                                        <tbody>${buildRowsHtml(unsanctionRows, columns)}</tbody>
-                                                    </table>
-                        <div id="${unsanctionTableId}-pagination" class="lc-pagination"></div>
-                        </div>
-                        </div>
-
+                                                <ul class="nav nav-tabs mb-3" id="${navId}" role="tablist">
+                                                <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#${sanctionTabId}" type="button">Sanction (${sanctionRows.length})</button></li>
+                                                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#${unsanctionTabId}" type="button">UnSanction (${unsanctionRows.length})</button></li>
+                                                </ul>
+                                                <div class="tab-content">
+                                                <div class="tab-pane fade show active" id="${sanctionTabId}">
+                                                ${toolbar(sanctionTableId, sanctionTitle, sanctionFile)}
+                                                <table id="${sanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
+                                                                                <thead><tr>${headerCells}</tr></thead>
+                                                                                <tbody>${buildRowsHtml(sanctionRows, columns)}</tbody>
+                                                                            </table>
+                                                <div id="${sanctionTableId}-pagination" class="lc-pagination"></div>
                                                 </div>
-                                            </div>`;
+                                                <div class="tab-pane fade" id="${unsanctionTabId}">
+                                                ${toolbar(unsanctionTableId, unsanctionTitle, unsanctionFile)}
+                                                <table id="${unsanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
+                                                                                <thead><tr>${headerCells}</tr></thead>
+                                                                                <tbody>${buildRowsHtml(unsanctionRows, columns)}</tbody>
+                                                                            </table>
+                                                <div id="${unsanctionTableId}-pagination" class="lc-pagination"></div>
+                                                </div>
+                                                </div>
+
+                                                                        </div>
+                                                                    </div>`;
             }
 
             function renderTabs(data) {
@@ -973,28 +1031,28 @@
                     const endRecord = Math.min(end, dataRows.length);
 
                     pagination.innerHTML = `
-                                <div class="lc-pagination-info">
-                                    Showing ${startRecord} to ${endRecord} of ${dataRows.length} records
-                                </div>
-                                <div class="lc-pagination-controls">
-                                    <button type="button"
-                                            class="btn btn-sm btn-outline-primary lc-page-btn"
-                                            data-page="prev"
-                                            ${currentPage === 1 ? 'disabled' : ''}>
-                                        &laquo; Previous
-                                    </button>
-                                    ${buildPageButtons(currentPage, totalPages)}
-                                    <button type="button"
-                                            class="btn btn-sm btn-outline-primary lc-page-btn"
-                                            data-page="next"
-                                            ${currentPage === totalPages ? 'disabled' : ''}>
-                                        Next &raquo;
-                                    </button>
-                                </div>
-                            `;
+                                                        <div class="lc-pagination-info">
+                                                            Showing ${startRecord} to ${endRecord} of ${dataRows.length} records
+                                                        </div>
+                                                        <div class="lc-pagination-controls">
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-outline-primary lc-page-btn"
+                                                                    data-page="prev"
+                                                                    ${currentPage === 1 ? 'disabled' : ''}>
+                                                                &laquo; Previous
+                                                            </button>
+                                                            ${buildPageButtons(currentPage, totalPages)}
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-outline-primary lc-page-btn"
+                                                                    data-page="next"
+                                                                    ${currentPage === totalPages ? 'disabled' : ''}>
+                                                                Next &raquo;
+                                                            </button>
+                                                        </div>
+                                                    `;
 
                     pagination.querySelectorAll('.lc-page-btn').forEach(button => {
-                        button.addEventListener('click', function () {
+                        button.addEventListener('click', function() {
                             const value = this.getAttribute('data-page');
 
                             if (value === 'prev' && currentPage > 1) {
@@ -1045,12 +1103,12 @@
                         }
 
                         return `
-                                    <button type="button"
-                                            class="btn btn-sm ${page === current ? 'btn-primary' : 'btn-outline-primary'} lc-page-btn"
-                                            data-page="${page}">
-                                        ${page}
-                                    </button>
-                                `;
+                                                            <button type="button"
+                                                                    class="btn btn-sm ${page === current ? 'btn-primary' : 'btn-outline-primary'} lc-page-btn"
+                                                                    data-page="${page}">
+                                                                ${page}
+                                                            </button>
+                                                        `;
                     }).join('');
                 }
 
@@ -1080,7 +1138,7 @@
 
             if (recordsTabs) {
 
-                recordsTabs.addEventListener("click", async function (e) {
+                recordsTabs.addEventListener("click", async function(e) {
 
                     // -------------------------
                     // Export Buttons
@@ -1131,34 +1189,7 @@
                     // Edit
                     // -------------------------
                     if (btn.classList.contains("edit-btn")) {
-
-                        try {
-
-                            const response = await fetch(`?handler=Item&id=${id}`);
-
-                            if (!response.ok)
-                                throw new Error("Unable to load record.");
-
-                            const json = await response.json();
-
-                            if (json.success) {
-
-                                populateForm(json.data);
-
-                            }
-                            else {
-
-                                setStatus(json.message || "Record not found.", true);
-
-                            }
-
-                        }
-                        catch (err) {
-
-                            setStatus(err.message, true);
-
-                        }
-
+                        await loadRecordIntoForm(id);
                         return;
                     }
 
@@ -1247,6 +1278,14 @@
             });
 
             loadRecords();
+
+            // If this page was opened as addnewlc?id=5 (e.g. from the Edit button on the
+            // Index page's Saved LC Records grid), automatically fetch that record and
+            // fill the form in, instead of showing a blank Add form.
+            const urlEditId = new URLSearchParams(window.location.search).get('id');
+            if (urlEditId) {
+                loadRecordIntoForm(urlEditId);
+            }
         })();
     </script>
 }

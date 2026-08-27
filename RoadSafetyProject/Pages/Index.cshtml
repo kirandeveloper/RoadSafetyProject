@@ -3,6 +3,30 @@
 
 @{
     ViewData["Title"] = "Home page";
+
+    // Fixed division buckets, in display order. "Other" catches any record whose
+    // Division text doesn't match one of the five known divisions.
+    var recordDivisions = new (string Key, string Label)[]
+    {
+        ("Mumbai", "Mumbai"),
+        ("BSL", "Bhusawal"),
+        ("NGP", "Nagpur"),
+        ("Pune", "Pune"),
+        ("SUR", "Solapur"),
+        ("Other", "Other / Unspecified"),
+    };
+
+    // The six record categories, now nested inside each division tab rather than
+    // being the top-level grouping.
+    var recordCategories = new (string Key, string Label)[]
+    {
+        ("basic", "Static Feature"),
+        ("tender", "Tender Details"),
+        ("land", "CA Plan"),
+        ("lhsVup", "LHS & VUP"),
+        ("design", "Design"),
+        ("noc", "NOC"),
+    };
 }
 
 @Html.AntiForgeryToken()
@@ -17,39 +41,62 @@
             </div>
         </div>
         <div class="col-md-8 mb-3">
-            <div class="col-md-12 mb-3">
-                <div class="stats-box topcard2">
-                    <h3 class="rsheadertop">Road Safety Project</h3>
+            <div class="row">
+                <div class="col-md-6 col-12">
+                    <div class="stats-box bg-light lc-summery">
+                        <h3>Summery Division Wise LC, Total LC: <span id="totalLC">0</span></h3>
+                        <div class="row">
+                            <div class="col-md-5 col-12 lc-divisions">
+                                <h5>Sanctioned</h5>
+                                <ul class="lcsactioned">
+                                    <li><span>Mumbai (BB)</span><span id="sanMumbai">0</span></li>
+                                    <li><span>Bhusawal (BSL)</span><span id="sanBSL">0</span></li>
+                                    <li><span>Nagpur (NGP)</span><span id="sanNGP">0</span></li>
+                                    <li><span>Pune (PA)</span><span id="sanPune">0</span></li>
+                                    <li><span>Solapur (SUR)</span><span id="sanSUR">0</span></li>
+                                    <li class="fw-bold border-top pt-1 mt-1"><span>Total Sanctioned</span><span id="totalSanctioned">0</span></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-1">&nbsp;</div>
+                            <div class="col-md-5 col-12 lc-divisions">
+                                <h5>UnSanctioned</h5>
+                                <ul class="lcunsactioned">
+                                    <li><span>Mumbai (BB)</span><span id="unsMumbai">0</span></li>
+                                    <li><span>Bhusawal (BSL)</span><span id="unsBSL">0</span></li>
+                                    <li><span>Nagpur (NGP)</span><span id="unsNGP">0</span></li>
+                                    <li><span>Pune (PA)</span><span id="unsPune">0</span></li>
+                                    <li><span>Solapur (SUR)</span><span id="unsSUR">0</span></li>
+                                    <li class="fw-bold border-top pt-1 mt-1"><span>Total UnSanctioned</span><span id="totalUnSanctioned">0</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="stats-box bg-light lc-summery">
+                        <h3>Summery DPR Consultancy Wise LC</h3>
+                        <div class="row">
+                            <div class="col-12">
+                                <table class="table table-sm table-bordered mb-0" id="consultancySummaryTable">
+                                    <thead>
+                                        <tr>
+                                            <th>DPR Consultancy</th>
+                                            <th class="text-end">Sanctioned</th>
+                                            <th class="text-end">UnSanctioned</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="consultancySummaryBody">
+                                        <tr><td colspan="3" class="text-center text-muted">Loading...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="stats-box bg-light lc-summery">
-                <h3>Summery Division Wise LC, Total LC: <span id="totalLC">0</span></h3>
-                <div class="row">
-                    <div class="col-md-5 col-12 lc-divisions">
-                        <h5>Sanctioned</h5>
-                        <ul class="lcsactioned">
-                            <li><span>Mumbai (BB)</span><span id="sanMumbai">0</span></li>
-                            <li><span>Bhusawal (BSL)</span><span id="sanBSL">0</span></li>
-                            <li><span>Nagpur (NGP)</span><span id="sanNGP">0</span></li>
-                            <li><span>Pune (PA)</span><span id="sanPune">0</span></li>
-                            <li><span>Solapur (SUR)</span><span id="sanSUR">0</span></li>
-                            <li class="fw-bold border-top pt-1 mt-1"><span>Total Sanctioned</span><span id="totalSanctioned">0</span></li>
-                        </ul>
-                    </div>
-                    <div class="col-md-1">&nbsp;</div>
-                    <div class="col-md-5 col-12 lc-divisions">
-                        <h5>UnSanctioned</h5>
-                        <ul class="lcunsactioned">
-                            <li><span>Mumbai (BB)</span><span id="unsMumbai">0</span></li>
-                            <li><span>Bhusawal (BSL)</span><span id="unsBSL">0</span></li>
-                            <li><span>Nagpur (NGP)</span><span id="unsNGP">0</span></li>
-                            <li><span>Pune (PA)</span><span id="unsPune">0</span></li>
-                            <li><span>Solapur (SUR)</span><span id="unsSUR">0</span></li>
-                            <li class="fw-bold border-top pt-1 mt-1"><span>Total UnSanctioned</span><span id="totalUnSanctioned">0</span></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+
+            
+
         </div>
         <!-- Summary Cards -->
         <div class="row">
@@ -65,78 +112,57 @@
                     <div class="p-3">
                         <div id="recordsStatus" class="mb-2"></div>
 
-                        <ul class="nav nav-tabs" id="recordsTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="tab-basic-btn" data-bs-toggle="tab" data-bs-target="#tab-basic" type="button" role="tab">Basic Details</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="tab-tender-btn" data-bs-toggle="tab" data-bs-target="#tab-tender" type="button" role="tab">Tender Details</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="tab-land-btn" data-bs-toggle="tab" data-bs-target="#tab-land" type="button" role="tab">Land Acquisition</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="tab-utility-btn" data-bs-toggle="tab" data-bs-target="#tab-utility" type="button" role="tab">Utility Shifting</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="tab-design-btn" data-bs-toggle="tab" data-bs-target="#tab-design" type="button" role="tab">Design</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="tab-noc-btn" data-bs-toggle="tab" data-bs-target="#tab-noc" type="button" role="tab">NOC</button>
-                            </li>
+                        <!-- Level 1: Division -->
+                        <ul class="nav nav-tabs" id="divisionTabs" role="tablist">
+                            @foreach (var (dKey, dLabel) in recordDivisions)
+                            {
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link @(dKey == recordDivisions[0].Key ? "active" : "")"
+                                            id="div-@(dKey)-btn" data-bs-toggle="tab" data-bs-target="#div-@(dKey)"
+                                            type="button" role="tab">
+                                        @dLabel
+                                    </button>
+                                </li>
+                            }
                         </ul>
 
-                        <div class="tab-content border border-top-0 p-3" id="recordsTabsContent">
+                        <div class="tab-content border border-top-0 p-3" id="divisionTabsContent">
+                            @foreach (var (dKey, dLabel) in recordDivisions)
+                            {
+                                <div class="tab-pane fade @(dKey == recordDivisions[0].Key ? "show active" : "")" id="div-@(dKey)" role="tabpanel">
 
-                            <!-- Basic Details -->
-                            <div class="tab-pane fade show active" id="tab-basic" role="tabpanel">
-                                <div id="body-basic">
-                                    <p class="text-center text-muted">Loading...</p>
+                                    <!-- Level 2: Category, within this division -->
+                                    <ul class="nav nav-pills mb-3" id="catTabs-@(dKey)" role="tablist">
+                                        @foreach (var (cKey, cLabel) in recordCategories)
+                                        {
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link @(cKey == recordCategories[0].Key ? "active" : "")"
+                                                        id="cat-@(dKey)-@(cKey)-btn" data-bs-toggle="pill" data-bs-target="#cat-@(dKey)-@(cKey)"
+                                                        type="button" role="tab">
+                                                    @cLabel
+                                                </button>
+                                            </li>
+                                        }
+                                    </ul>
+
+                                    <div class="tab-content">
+                                        @foreach (var (cKey, cLabel) in recordCategories)
+                                        {
+                                            <div class="tab-pane fade @(cKey == recordCategories[0].Key ? "show active" : "")" id="cat-@(dKey)-@(cKey)" role="tabpanel">
+                                                <div id="body-@(dKey)-@(cKey)">
+                                                    <p class="text-center text-muted">Loading...</p>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+
                                 </div>
-                            </div>
-
-                            <!-- Tender Details -->
-                            <div class="tab-pane fade" id="tab-tender" role="tabpanel">
-                                <div id="body-tender">
-                                    <p class="text-center text-muted">Loading...</p>
-                                </div>
-                            </div>
-
-                            <!-- Land Acquisition -->
-                            <div class="tab-pane fade" id="tab-land" role="tabpanel">
-                                <div id="body-land">
-                                    <p class="text-center text-muted">Loading...</p>
-                                </div>
-                            </div>
-
-                            <!-- Utility Shifting -->
-                            <div class="tab-pane fade" id="tab-utility" role="tabpanel">
-                                <div id="body-utility">
-                                    <p class="text-center text-muted">Loading...</p>
-                                </div>
-                            </div>
-
-                            <!-- Design -->
-                            <div class="tab-pane fade" id="tab-design" role="tabpanel">
-                                <div id="body-design">
-                                    <p class="text-center text-muted">Loading...</p>
-                                </div>
-                            </div>
-
-                            <!-- NOC -->
-                            <div class="tab-pane fade" id="tab-noc" role="tabpanel">
-                                <div id="body-noc">
-                                    <p class="text-center text-muted">Loading...</p>
-                                </div>
-                            </div>
-
+                            }
                         </div>
                     </div>
+
                 </div>
             </div>
-            <!-- Saved LC Records (merged from addnewlc.cshtml) -->
-
-
         </div>
     </div>
 </div>
@@ -156,20 +182,49 @@
             const antiForgeryToken = tokenInput ? tokenInput.value : '';
             const recordsStatus = document.getElementById('recordsStatus');
 
-            const tabBodies = {
-                basic: document.getElementById('body-basic'),
-                tender: document.getElementById('body-tender'),
-                land: document.getElementById('body-land'),
-                utility: document.getElementById('body-utility'),
-                design: document.getElementById('body-design'),
-                noc: document.getElementById('body-noc')
-            };
+            // Fixed division buckets, matching a record's free-text Division against a
+            // known short code (e.g. "BSL") or full name (e.g. "Bhusawal") — case-insensitive,
+            // partial match — since the Add New LC form's division field is free text.
+            const DIVISIONS = [
+                { key: 'Mumbai', code: 'BB', name: 'Mumbai' },
+                { key: 'BSL', code: 'BSL', name: 'Bhusawal' },
+                { key: 'NGP', code: 'NGP', name: 'Nagpur' },
+                { key: 'Pune', code: 'PA', name: 'Pune' },
+                { key: 'SUR', code: 'SUR', name: 'Solapur' }
+            ];
+            const DIVISION_KEYS = DIVISIONS.map(d => d.key).concat('Other');
+
+            function matchesDivision(divisionText, cfg) {
+                const v = (divisionText || '').toString().trim().toLowerCase();
+                if (!v) return false;
+                return v === cfg.code.toLowerCase() ||
+                    v === cfg.name.toLowerCase() ||
+                    v.includes(cfg.name.toLowerCase()) ||
+                    v.includes(cfg.code.toLowerCase());
+            }
+
+            function divisionKeyFor(row) {
+                const cfg = DIVISIONS.find(c => matchesDivision(row.division, c));
+                return cfg ? cfg.key : 'Other';
+            }
+
+            const CATEGORY_KEYS = ['basic', 'tender', 'land', 'lhsVup', 'design', 'noc'];
+
+            // tabBodies[divKey][catKey] -> the container div JS fills with the
+            // Sanction/UnSanction sub-tabs + table for that division/category combo.
+            const tabBodies = {};
+            DIVISION_KEYS.forEach(divKey => {
+                tabBodies[divKey] = {};
+                CATEGORY_KEYS.forEach(catKey => {
+                    tabBodies[divKey][catKey] = document.getElementById(`body-${divKey}-${catKey}`);
+                });
+            });
 
             const tabTitles = {
                 basic: 'Basic Details',
                 tender: 'Tender Details',
                 land: 'Land Acquisition',
-                utility: 'Utility Shifting',
+                lhsVup: 'LHS & VUP',
                 design: 'Design',
                 noc: 'NOC'
             };
@@ -209,6 +264,42 @@
                     if (totalLcEl) totalLcEl.textContent = totalSanctioned + totalUnSanctioned;
                 } catch (err) {
                     console.error('Failed to load division summary:', err);
+                }
+            }
+
+            // Populates the "Summery DPR Consultancy Wise LC" table from the DB-backed
+            // ?handler=ConsultancyCounts endpoint — Sanctioned/UnSanctioned split per
+            // consultancy name (free text, e.g. "PEMS"), plus a totals row.
+            async function loadConsultancySummary() {
+                const bodyEl = document.getElementById('consultancySummaryBody');
+                if (!bodyEl) return;
+
+                try {
+                    const res = await fetch('?handler=ConsultancyCounts', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                    const json = await res.json();
+                    if (!json.success) return;
+
+                    const data = json.data || [];
+
+                    if (data.length === 0) {
+                        bodyEl.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No DPR Consultancy data yet.</td></tr>';
+                        return;
+                    }
+
+                    let totalSan = 0;
+                    let totalUns = 0;
+
+                    const rows = data.map(d => {
+                        totalSan += d.sanctioned || 0;
+                        totalUns += d.unSanctioned || 0;
+                        return `<tr><td>${esc(d.name)}</td><td class="text-end">${d.sanctioned}</td><td class="text-end">${d.unSanctioned}</td></tr>`;
+                    }).join('');
+
+                    const totalRow = `<tr class="fw-bold border-top"><td>Total</td><td class="text-end">${totalSan}</td><td class="text-end">${totalUns}</td></tr>`;
+
+                    bodyEl.innerHTML = rows + totalRow;
+                } catch (err) {
+                    console.error('Failed to load DPR Consultancy summary:', err);
                 }
             }
 
@@ -301,9 +392,9 @@
 
             function actionsCell(id) {
                 return `<td>
-                                                    <button class="btn btn-sm edit-btn" data-id="${id}"><i class="bi bi-pencil"></i></button>
-                                                    <button class="btn btn-sm delete-btn" data-id="${id}"><i class="bi bi-trash"></i></button>
-                                       </td>`;
+                                                                                            <button class="btn btn-sm edit-btn" data-id="${id}"><i class="bi bi-pencil"></i></button>
+                                                                                            <button class="btn btn-sm delete-btn" data-id="${id}"><i class="bi bi-trash"></i></button>
+                                                                               </td>`;
             }
 
             function yn(v) {
@@ -316,7 +407,7 @@
 
             const tabColumns = {
                 basic: [
-                    { key: 'id', label: 'ID' }, { key: 'yearOfSanction', label: 'Year' },
+                    { key: 'id', label: 'ID' }, { key: 'projectName', label: 'Project Name' }, { key: 'yearOfSanction', label: 'Year' },
                     { key: 'lcNo', label: 'LC No.' }, { key: 'locationKm', label: 'Location Km' },
                     { key: 'sectionName', label: 'Section' }, { key: 'spanArrangement', label: 'Span Arrangement' },
                     { key: 'skewAngle', label: 'Skew Angle' }, { key: 'distanceExistingLc', label: 'Distance from Existing LC' },
@@ -337,30 +428,26 @@
                     { key: 'gazette20E', label: '20E Gazette' }, { key: 'paper20E', label: '20E Paper' },
                     { key: 'form20F', label: '20F' }, { key: 'remark', label: 'Remark' }
                 ],
-                utility: [
+
+                lhsVup: [
                     { key: 'id', label: 'ID' }, { key: 'lcNo', label: 'LC No.' },
-                    { key: 'stStatus', label: 'S & T' }, { key: 'trdStatus', label: 'TRD' }, { key: 'electricalG', label: 'Electrical (G)' }
+                    { key: 'gadExit', label: 'Exits/GAD', fmt: yn },
+                    { key: 'design', label: 'Design' },
+                    { key: 'exitNo', label: 'Exit No.' },
+                    { key: 'noExit', label: 'No Exit' }
                 ],
                 design: [
                     { key: 'id', label: 'ID' }, { key: 'lcNo', label: 'LC No.' },
-                    { key: 'substructureStatus', label: 'Substructure' }, { key: 'superStructureStatus', label: 'Super Structure' },
-                    { key: 'commissioningStatus', label: 'Commissioning' }, { key: 'gadExit', label: 'Exits/GAD', fmt: yn },
-                    { key: 'design', label: 'Design' }, { key: 'exitNo', label: 'Exit No.' }, { key: 'noExit', label: 'No Exit' }
+                    { key: 'utilityShifting', label: 'Utility Shifting' },
+                    { key: 'substructureStatus', label: 'Substructure' },
+                    { key: 'superStructureStatus', label: 'Super Structure' },
+                    { key: 'commissioningStatus', label: 'Commissioning' }
                 ],
                 noc: [
                     { key: 'id', label: 'ID' }, { key: 'lcNo', label: 'LC No.' },
                     { key: 'nocClosingLc', label: 'NOC of Closing LC' }, { key: 'soa', label: 'SOA' }
                 ]
             };
-
-            function groupByDivision(data) {
-                const groups = {};
-                data.forEach(r => {
-                    const key = (r.division && r.division.trim()) ? r.division.trim() : 'Unspecified Division';
-                    (groups[key] = groups[key] || []).push(r);
-                });
-                return Object.keys(groups).sort((a, b) => a.localeCompare(b)).map(name => ({ name, rows: groups[name] }));
-            }
 
             function isUnSanctionRow(r) {
                 return (r.lcStatus || '').toString().trim().toLowerCase() === 'unsanction';
@@ -508,7 +595,31 @@
                 renderPage(1);
             }
 
-            function buildDivisionTable(divisionName, rows, columns, uid, tabLabel) {
+            // Groups a set of rows by DPR Consultancy (free text, so grouped as typed —
+            // trimmed and counted case-insensitively) and renders it as small badges.
+            // Used only in the Basic Details tab, separately per Sanction/UnSanction.
+            function consultancyBadges(rows) {
+                const counts = {};
+                const displayName = {};
+                rows.forEach(r => {
+                    const raw = (r.dprConsultancy || '').toString().trim();
+                    if (!raw) return;
+                    const key = raw.toLowerCase();
+                    counts[key] = (counts[key] || 0) + 1;
+                    displayName[key] = raw;
+                });
+
+                const keys = Object.keys(counts).sort((a, b) => counts[b] - counts[a] || a.localeCompare(b));
+                if (keys.length === 0) return '';
+
+                const badges = keys
+                    .map(k => `<span class="badge bg-secondary me-1 mb-1">${esc(displayName[k])}: ${counts[k]}</span>`)
+                    .join('');
+
+                return `<div class="px-3 pb-2"><strong>DPR Consultancy:</strong> ${badges}</div>`;
+            }
+
+            function buildDivisionTable(divisionName, rows, columns, uid, tabLabel, showConsultancy = false) {
                 const headerCells = columns.map(c => `<th>${esc(c.label)}</th>`).join('') + '<th style="width:130px;">Actions</th>';
 
                 const sanctionRows = rows.filter(r => !isUnSanctionRow(r));
@@ -526,93 +637,102 @@
                 const unsanctionFile = sanitizeFilename(`${divisionName}_${tabLabel}_UnSanction`);
 
                 const toolbar = (tableId, title, filename) => `
-                                                                        <div class="d-flex justify-content-end gap-2 mb-2">
-                                                                            <button type="button" class="btn btn-sm export-print-btn"
-                                                                                            data-table-id="${tableId}" data-title="${esc(title)}"><i class="bi bi-printer-fill"></i></button>
-                                                                            <button type="button" class="btn btn-sm export-excel-btn"
-                                                                                            data-table-id="${tableId}" data-filename="${esc(filename)}"><i class="bi bi-file-earmark-excel-fill"></i></button>
-                                                                            <button type="button" class="btn btn-sm export-pdf-btn"
-                                                                                            data-table-id="${tableId}" data-title="${esc(title)}" data-filename="${esc(filename)}"><i class="bi bi-file-earmark-pdf-fill"></i></button>
-                                                                        </div>`;
+                                                                                                                <div class="d-flex justify-content-end gap-2 mb-2">
+                                                                                                                    <button type="button" class="btn btn-sm export-print-btn"
+                                                                                                                                    data-table-id="${tableId}" data-title="${esc(title)}"><i class="bi bi-printer-fill"></i></button>
+                                                                                                                    <button type="button" class="btn btn-sm export-excel-btn"
+                                                                                                                                    data-table-id="${tableId}" data-filename="${esc(filename)}"><i class="bi bi-file-earmark-excel-fill"></i></button>
+                                                                                                                    <button type="button" class="btn btn-sm export-pdf-btn"
+                                                                                                                                    data-table-id="${tableId}" data-title="${esc(title)}" data-filename="${esc(filename)}"><i class="bi bi-file-earmark-pdf-fill"></i></button>
+                                                                                                                </div>`;
 
                 return `
-                                                                                <div class="mb-4">
-                                                                                                   <div class="row body-basic-header">
-                                                                                      <div class="col-md-6 col-6">
-                                                                                           <h5 class="fw-bold mb-2">${esc(divisionName)} <span class="text-muted fw-normal">(${rows.length} record${rows.length === 1 ? '' : 's'})</span></h5>
-                                                                                      </div>
-                                                                                      <div class="col-md-6 col-6">
-                                                                                                 <ul class="nav nav-tabs mb-3 justify-content-end" id="${navId}" role="tablist">
-                                                                                               <li class="nav-item">
-                                                                                                    <button class="nav-link sanction-tab active"
-                                                                                                            data-bs-toggle="tab"
-                                                                                                            data-bs-target="#${sanctionTabId}"
-                                                                                                            type="button">
-                                                                                                        Sanction (${sanctionRows.length})
-                                                                                                    </button>
-                                                                                                </li>
+                                                                                                                        <div class="mb-4">
+                                                                                                                                           <div class="row body-basic-header">
+                                                                                                                              <div class="col-md-6 col-6">
+                                                                                                                                   <h5 class="fw-bold mb-2 text-muted fw-normal">${rows.length} record${rows.length === 1 ? '' : 's'}</h5>
+                                                                                                                              </div>
+                                                                                                                              <div class="col-md-6 col-6">
+                                                                                                                                         <ul class="nav nav-tabs mb-3 justify-content-end" id="${navId}" role="tablist">
+                                                                                                                                       <li class="nav-item">
+                                                                                                                                            <button class="nav-link sanction-tab active"
+                                                                                                                                                    data-bs-toggle="tab"
+                                                                                                                                                    data-bs-target="#${sanctionTabId}"
+                                                                                                                                                    type="button">
+                                                                                                                                                Sanction (${sanctionRows.length})
+                                                                                                                                            </button>
+                                                                                                                                        </li>
 
-                                                                                                <li class="nav-item">
-                                                                                                    <button class="nav-link unsanction-tab"
-                                                                                                            data-bs-toggle="tab"
-                                                                                                            data-bs-target="#${unsanctionTabId}"
-                                                                                                            type="button">
-                                                                                                        UnSanction (${unsanctionRows.length})
-                                                                                                    </button>
-                                                                                                </li>
-                                                                                        </ul>
-                                                                                      </div>
-                                                                                   </div>
+                                                                                                                                        <li class="nav-item">
+                                                                                                                                            <button class="nav-link unsanction-tab"
+                                                                                                                                                    data-bs-toggle="tab"
+                                                                                                                                                    data-bs-target="#${unsanctionTabId}"
+                                                                                                                                                    type="button">
+                                                                                                                                                UnSanction (${unsanctionRows.length})
+                                                                                                                                            </button>
+                                                                                                                                        </li>
+                                                                                                                                </ul>
+                                                                                                                              </div>
+                                                                                                                           </div>
 
-                                                                                    <div class="table-responsive">
+                                                                                                                            <div class="table-responsive">
 
                                            
-                                                            <div class="tab-content">
-                                                            <div class="tab-pane fade show active" id="${sanctionTabId}">
-                                                                    <h3 class="pt-4 ps-3 text-success">Status of Sanction work for LC elimination under construction/Road Saftey Project</h3>
-                                                            ${toolbar(sanctionTableId, sanctionTitle, sanctionFile)}
-                                                            <table id="${sanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
-                                                                                            <thead><tr>${headerCells}</tr></thead>
-                                                                                            <tbody>${buildRowsHtml(sanctionRows, columns)}</tbody>
-                                                                                        </table>
-                                                                                        <div id="${sanctionTableId}-pagination" class="table-pagination"></div>
-                                                            </div>
-                                                            <div class="tab-pane fade" id="${unsanctionTabId}">
-                                                                    <h3 class="pt-4 ps-3 text-danger">Status of UnSanction work ROB assigned to RSP</h3>
-                                                            ${toolbar(unsanctionTableId, unsanctionTitle, unsanctionFile)}
-                                                            <table id="${unsanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
-                                                                                            <thead><tr>${headerCells}</tr></thead>
-                                                                                            <tbody>${buildRowsHtml(unsanctionRows, columns)}</tbody>
-                                                                                        </table>
-                                                                                        <div id="${unsanctionTableId}-pagination" class="table-pagination"></div>
-                                                            </div>
-                                                            </div>
+                                                                                                    <div class="tab-content">
+                                                                                                    <div class="tab-pane fade show active" id="${sanctionTabId}">
+                                                                                                            <h3 class="pt-4 ps-3 text-success">Status of Sanction work for LC elimination under construction/Road Saftey Project</h3>
+                                                                                                    ${showConsultancy ? consultancyBadges(sanctionRows) : ''}
+                                                                                                    ${toolbar(sanctionTableId, sanctionTitle, sanctionFile)}
+                                                                                                    <table id="${sanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
+                                                                                                                                    <thead><tr>${headerCells}</tr></thead>
+                                                                                                                                    <tbody>${buildRowsHtml(sanctionRows, columns)}</tbody>
+                                                                                                                                </table>
+                                                                                                                                <div id="${sanctionTableId}-pagination" class="table-pagination"></div>
+                                                                                                    </div>
+                                                                                                    <div class="tab-pane fade" id="${unsanctionTabId}">
+                                                                                                            <h3 class="pt-4 ps-3 text-danger">Status of UnSanction work ROB assigned to RSP</h3>
+                                                                                                    ${showConsultancy ? consultancyBadges(unsanctionRows) : ''}
+                                                                                                    ${toolbar(unsanctionTableId, unsanctionTitle, unsanctionFile)}
+                                                                                                    <table id="${unsanctionTableId}" class="table table-bordered table-hover align-middle table-sm">
+                                                                                                                                    <thead><tr>${headerCells}</tr></thead>
+                                                                                                                                    <tbody>${buildRowsHtml(unsanctionRows, columns)}</tbody>
+                                                                                                                                </table>
+                                                                                                                                <div id="${unsanctionTableId}-pagination" class="table-pagination"></div>
+                                                                                                    </div>
+                                                                                                    </div>
 
-                                                                                    </div>
-                                                                                </div>`;
+                                                                                                                            </div>
+                                                                                                                        </div>`;
             }
 
             function renderTabs(data) {
-                if (!data || data.length === 0) {
-                    Object.values(tabBodies).forEach(el => {
-                        el.innerHTML = '<p class="text-center text-muted">No records found.</p>';
+                DIVISION_KEYS.forEach(divKey => {
+                    CATEGORY_KEYS.forEach(catKey => {
+                        const el = tabBodies[divKey][catKey];
+                        if (el) el.innerHTML = '<p class="text-center text-muted">No records found.</p>';
                     });
-                    return;
-                }
+                });
 
-                const groups = groupByDivision(data);
+                if (!data || data.length === 0) return;
 
-                Object.keys(tabColumns).forEach(tabKey => {
-                    const columns = tabColumns[tabKey];
-                    tabBodies[tabKey].innerHTML = groups
-                        .map((g, idx) => buildDivisionTable(g.name, g.rows, columns, `${tabKey}-${idx}`, tabTitles[tabKey] || tabKey))
-                        .join('');
+                DIVISION_KEYS.forEach(divKey => {
+                    const divisionRows = data.filter(r => divisionKeyFor(r) === divKey);
 
-                    // Give every generated Sanction / UnSanction table its own
-                    // client-side pagination with 10 records per page.
-                    tabBodies[tabKey]
-                        .querySelectorAll('table[id^="tbl-"]')
-                        .forEach(table => setupTablePagination(table.id, 10));
+                    CATEGORY_KEYS.forEach((catKey, idx) => {
+                        const el = tabBodies[divKey][catKey];
+                        if (!el) return;
+
+                        const columns = tabColumns[catKey];
+                        el.innerHTML = buildDivisionTable(
+                            divKey, divisionRows, columns, `${divKey}-${catKey}`,
+                            tabTitles[catKey] || catKey, catKey === 'basic'
+                        );
+
+                        // Give every generated Sanction / UnSanction table its own
+                        // client-side pagination with 10 records per page.
+                        el.querySelectorAll('table[id^="tbl-"]')
+                            .forEach(table => setupTablePagination(table.id, 10));
+                    });
                 });
             }
 
@@ -633,7 +753,7 @@
                 }
             }
 
-            const recordsTabs = document.getElementById("recordsTabsContent");
+            const recordsTabs = document.getElementById("divisionTabsContent");
 
             if (recordsTabs) {
                 recordsTabs.addEventListener("click", async function(e) {
@@ -662,9 +782,9 @@
                     const id = btn.getAttribute("data-id");
                     if (!id) return;
 
-                    // Edit: the add/edit form lives on the "addnewlc" page, so send the
-                    // user there. (Wire up a matching ?id= pre-fill on that page if you
-                    // want the record to load automatically.)
+                    // Edit: the add/edit form lives on the "addnewlc" page. addnewlc.cshtml
+                    // reads this ?id= from the URL on load and auto-populates the form with
+                    // that record.
                     if (btn.classList.contains("edit-btn")) {
                         window.location.href = `addnewlc?id=${id}`;
                         return;
@@ -688,6 +808,7 @@
                             if (json.success) {
                                 await loadRecords();
                                 await loadDivisionSummary();
+                                await loadConsultancySummary();
                             }
                         } catch (err) {
                             setRecordsStatus(err.message, true);
@@ -698,6 +819,7 @@
 
             loadRecords();
             loadDivisionSummary();
+            loadConsultancySummary();
         })();
     </script>
 }

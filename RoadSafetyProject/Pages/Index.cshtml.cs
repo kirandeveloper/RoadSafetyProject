@@ -116,6 +116,32 @@ namespace RoadSafetyProject.Pages
             return new JsonResult(new { success = true, data });
         }
 
+        // GET ?handler=ConsultancyCounts -> Sanctioned / UnSanctioned record counts per
+        // DPR Consultancy, for the "Summery DPR Consultancy Wise LC" box. Unlike Division,
+        // DprConsultancy is free text with no fixed list (e.g. "PEMS"), so this groups by
+        // whatever distinct values actually exist in the data rather than matching against
+        // known names. Grouping is case-insensitive/trimmed so "PEMS" and "pems " count
+        // together but display using however it was most recently typed.
+        public JsonResult OnGetConsultancyCounts()
+        {
+            var items = _repo.GetAll();
+
+            var data = items
+                .Where(x => !string.IsNullOrWhiteSpace(x.DprConsultancy))
+                .GroupBy(x => x.DprConsultancy.Trim(), StringComparer.OrdinalIgnoreCase)
+                .Select(g => new
+                {
+                    name = g.First().DprConsultancy.Trim(),
+                    sanctioned = g.Count(x => !IsUnSanction(x.LcStatus)),
+                    unSanctioned = g.Count(x => IsUnSanction(x.LcStatus))
+                })
+                .OrderByDescending(g => g.sanctioned + g.unSanctioned)
+                .ThenBy(g => g.name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            return new JsonResult(new { success = true, data });
+        }
+
         // GET ?handler=Item&id=5  -> single record (kept here in case the "Edit" button
         // on the Saved LC Records grid is later wired to pre-fill a form on this page).
         public JsonResult OnGetItem(int id)

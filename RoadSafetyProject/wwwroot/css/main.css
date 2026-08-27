@@ -197,6 +197,7 @@ p{
 	font-family: 'Poppins-Medium';
 	font-size: 1.4rem;
 	color: #212529;
+	margin-bottom:20px;
 }
 
 .lc-divisions ul {
@@ -211,7 +212,7 @@ p{
 	align-items: center;
 	font-family: 'Poppins-Medium';
 	font-size: 1.2rem;
-	margin-bottom: 10px;
+	margin-bottom: 40px;
 	/* Sharp Text Rendering */
 	font-weight: 500;
 	line-height: 1.5;
@@ -231,6 +232,62 @@ p{
 	color: #dc3545;
 }
 
+.lc-divisions ul.lcsummarydpr {
+	color: #dc3545;
+}
+
+
+.lcsummarydprdivh5 {
+	font-family: 'Poppins-Medium';
+	font-size: 1.4rem;
+	color: #212529;
+	margin-bottom: 20px;
+}
+
+.lcsummarydprdiv ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.lcsummarydprdiv ul li {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-family: 'Poppins-Medium';
+	font-size: 1.2rem;
+	margin-bottom: 22px;
+	/* Sharp Text Rendering */
+	font-weight: 500;
+	line-height: 1.5;
+	letter-spacing: 0.2px;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
+	text-shadow: none;
+	border-bottom: 1px solid #c0c0c0;
+}
+
+.lcsummarydprdiv ul.lcsactioned {
+	color: #14315c;
+}
+
+.lcsummarydprdiv ul.lcunsactioned {
+	color: #14315c;
+}
+
+.lcsummarydprdiv ul.lcsummarydpr {
+	color: #14315c;
+}
+
+#consultancySummaryTable thead tr th {
+	font-size: 1.3rem;
+}
+
+#consultancySummaryTable tbody tr td {
+	font-size: 1rem;
+	padding: 12px 0px;
+}
 /* Default Tabs */
 .sanction-tab,
 .unsanction-tab {
@@ -367,13 +424,13 @@ p{
 }
 
 .table thead tr th {
-	font-size: 0.8rem;
+	font-size: 1rem;
 	text-align: center;
 	vertical-align: text-top;
 }
 
 	.table tbody tr td {
-		font-size: 0.8rem;
+		font-size: 1rem;
 		text-align: center;
 		border-bottom 1px solid #c0c0c0;
 		border-left: 0px !important;
@@ -1473,7 +1530,7 @@ iframe {
 		font-family: 'Poppins-Medium';
 		background-color: rgb(20 49 92);
 		color: #fff !important;
-		font-size: 0.8rem !important;
+		font-size: 1rem !important;
 		border: 0px !important;
 		border-radius: 3px !important;
 	}
@@ -1482,7 +1539,7 @@ iframe {
 		font-family: 'Poppins-Medium';
 		background-color: transparent;
 		color: #14315c !important;
-		font-size: 0.8rem !important;
+		font-size: 1rem !important;
 		border-radius: 0px !important;
 	}
 
@@ -1569,12 +1626,29 @@ iframe {
 	margin:10px 0px;
 }
 
+.bi-file-earmark-excel-fill {
+	color: #08a508;
+	font-size:1.8rem;
+}
 
+.bi-file-earmark-pdf-fill {
+	color: #dc3535;
+	font-size: 1.8rem;
+}
+
+.bi-printer-fill {
+	color: #14315c;
+	font-size: 1.8rem;
+}
+
+.btn-sm delete-btn {
+	color: #f00;
+	font-size: 1.8rem;
+}
 
 /* ===========================
    Tablet
 =========================== */
-
 @media (max-width: 992px) {
 
 	.org-chart {
@@ -1589,14 +1663,13 @@ iframe {
 		padding: 10px 15px;
 	}
 
-	.gallery-img{
-        height:220px;
-    }
+	.gallery-img {
+		height: 220px;
+	}
 
-	.table-title{
-        font-size:1.5rem;
-    }
-
+	.table-title {
+		font-size: 1.5rem;
+	}
 }
 
 

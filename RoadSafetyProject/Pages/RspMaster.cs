@@ -68,7 +68,13 @@ namespace RoadSafetyProject.Models
         public string CheckedReceivedRemark { get; set; }
         public string GadExitRemark { get; set; }
 
+        public string ProjectName { get; set; }
 
+        // Work Details
+        public string NameOfWorks { get; set; }       // NAME_OF_WORKS
+        public string RoadCategory { get; set; }      // ROAD_CATEGORY
+        public string RobRubWork { get; set; }        // ROB_RUB_WORK
+        public string StatusOfWorks { get; set; }     // STATUS_OF_WORKS
 
     }
 }

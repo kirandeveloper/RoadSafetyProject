@@ -122,6 +122,11 @@ namespace RoadSafetyProject.Pages
         public int id { get; set; }
         public string lcStatus { get; set; }
         public int? srNo { get; set; }
+        public string projectName { get; set; }
+        public string nameOfWorks { get; set; }
+        public string roadCategory { get; set; }
+        public string robRubWork { get; set; }
+        public string statusOfWorks { get; set; }
         public string yearSanction { get; set; }
         public string lcNo { get; set; }
         public string locationKm { get; set; }
@@ -171,6 +176,11 @@ namespace RoadSafetyProject.Pages
                 Id = id,
                 LcStatus = string.IsNullOrWhiteSpace(lcStatus) ? "Sanction" : lcStatus,
                 SrNo = srNo,
+                ProjectName = projectName,
+                NameOfWorks = nameOfWorks,
+                RoadCategory = roadCategory,
+                RobRubWork = robRubWork,
+                StatusOfWorks = statusOfWorks,
                 YearOfSanction = yearSanction,
                 LcNo = lcNo,
                 LocationKm = locationKm,

@@ -32,7 +32,8 @@ namespace RoadSafetyProject.Data
         {
             const string sql = @"
                 INSERT INTO RSP_MASTER
-                (ID, SR_NO, YEAR_OF_SANCTION, LC_NO, LOCATION_KM, DIVISION, LC_STATUS, SECTION_NAME,
+                (ID, PROJECT_NAME, NAME_OF_WORKS, ROAD_CATEGORY, ROB_RUB_WORK, STATUS_OF_WORKS,
+                 SR_NO, YEAR_OF_SANCTION, LC_NO, LOCATION_KM, DIVISION, LC_STATUS, SECTION_NAME,
                  SPAN_ARRANGEMENT, SKEW_ANGLE, DISTANCE_EXISTING_LC, STATE_AUTHORITY_APPROVAL,
                  DPR_CONSULTANCY, EXECUTIVE_AGENCY, GAD, GAD_REMARK, CHECKED_RECEIVED, CHECKED_RECEIVED_REMARK,
                  SANCTIONED_CONT, SANCTIONED_DE, TENDER_STATUS, LC_7A_37A, GAZETTE_20A, PAPER_20A, FORM_20B,
@@ -41,7 +42,8 @@ namespace RoadSafetyProject.Data
                  COMMISSIONING_STATUS, GAD_EXIT, EXITS_GAD_REMARK, DESIGN_STATUS, EXIT_NO, NO_EXIT, DESIGN,
                  NOC_CLOSING_LC, SOA)
                 VALUES
-                (RSP_MASTER_SEQ.NEXTVAL, :srNo, :yearOfSanction, :lcNo, :locationKm, :division, :lcStatus, :sectionName,
+                (RSP_MASTER_SEQ.NEXTVAL, :projectName, :nameOfWorks, :roadCategory, :robRubWork, :statusOfWorks,
+                 :srNo, :yearOfSanction, :lcNo, :locationKm, :division, :lcStatus, :sectionName,
                  :spanArrangement, :skewAngle, :distanceExistingLc, :stateAuthorityApproval,
                  :dprConsultancy, :executiveAgency, :gad, :gadRemark, :checkedReceived, :checkedReceivedRemark,
                  :sanctionedCont, :sanctionedDe, :tenderStatus, :lc7a37a, :gazette20A, :paper20A, :form20B,
@@ -93,6 +95,11 @@ namespace RoadSafetyProject.Data
         {
             const string sql = @"
                 UPDATE RSP_MASTER SET
+                    PROJECT_NAME = :projectName,
+                    NAME_OF_WORKS = :nameOfWorks,
+                    ROAD_CATEGORY = :roadCategory,
+                    ROB_RUB_WORK = :robRubWork,
+                    STATUS_OF_WORKS = :statusOfWorks,
                     SR_NO = :srNo,
                     YEAR_OF_SANCTION = :yearOfSanction,
                     LC_NO = :lcNo,
@@ -200,6 +207,11 @@ namespace RoadSafetyProject.Data
         // ---------- helpers ----------
         private static void AddParameters(OracleCommand cmd, RspMaster m)
         {
+            cmd.Parameters.Add(new OracleParameter("projectName", OracleDbType.Varchar2) { Value = (object)m.ProjectName ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("nameOfWorks", OracleDbType.Varchar2) { Value = (object)m.NameOfWorks ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("roadCategory", OracleDbType.Varchar2) { Value = (object)m.RoadCategory ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("robRubWork", OracleDbType.Varchar2) { Value = (object)m.RobRubWork ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("statusOfWorks", OracleDbType.Varchar2) { Value = (object)m.StatusOfWorks ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("srNo", OracleDbType.Int32) { Value = (object)m.SrNo ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("yearOfSanction", OracleDbType.Varchar2) { Value = (object)m.YearOfSanction ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("lcNo", OracleDbType.Varchar2) { Value = (object)m.LcNo ?? DBNull.Value });
@@ -251,6 +263,11 @@ namespace RoadSafetyProject.Data
             return new RspMaster
             {
                 Id = GetInt(r, "ID") ?? 0,
+                ProjectName = GetString(r, "PROJECT_NAME"),
+                NameOfWorks = GetString(r, "NAME_OF_WORKS"),
+                RoadCategory = GetString(r, "ROAD_CATEGORY"),
+                RobRubWork = GetString(r, "ROB_RUB_WORK"),
+                StatusOfWorks = GetString(r, "STATUS_OF_WORKS"),
                 SrNo = GetInt(r, "SR_NO"),
                 YearOfSanction = GetString(r, "YEAR_OF_SANCTION"),
                 LcNo = GetString(r, "LC_NO"),

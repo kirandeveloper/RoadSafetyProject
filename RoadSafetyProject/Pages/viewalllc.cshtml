@@ -35,7 +35,7 @@
 
                     <div class="rob-titleblock">
                         <div>
-                            <div class="eyebrow">Road Over Bridge · Project Data Sheet</div>
+                            <div class="eyebrow">Railway Over Bridge · Project Data Sheet</div>
                             <h1>All LC Records</h1>
                         </div>
                         <div class="rob-meta">
@@ -151,6 +151,7 @@
                     { data: 'id', title: 'ID' },
                     { data: 'lcStatus', title: 'LC Status', render: text },
                     { data: 'srNo', title: 'Sr No', render: text },
+                    { data: 'projectName', title: 'Project Name', render: text },
                     { data: 'yearOfSanction', title: 'Year of Sanction', render: text },
                     { data: 'lcNo', name: 'lcNo', title: 'LC No.', render: text },
                     { data: 'locationKm', title: 'Location Km', render: text },
@@ -289,6 +290,33 @@
                     });
                 });
 
+                // Keep every count badge in sync with whatever a search/filter currently
+                // shows — not the total loaded. Fires on every draw: typing in a table's
+                // own search box, using the dedicated "Search by LC No" box, or paging.
+                function updateCountsForStatus(statusKey) {
+                    let statusTotal = 0;
+                    DIVISION_KEYS.forEach(divKey => {
+                        const tableKey = `${statusKey}-${divKey}`;
+                        const table = tables[tableKey];
+                        if (!table) return;
+                        const filteredCount = table.rows({ search: 'applied' }).count();
+                        const countEl = document.getElementById(`count-${tableKey}`);
+                        if (countEl) countEl.textContent = filteredCount;
+                        statusTotal += filteredCount;
+                    });
+                    const statusCountEl = document.getElementById(`count-${statusKey}`);
+                    if (statusCountEl) statusCountEl.textContent = statusTotal;
+                }
+
+                ['sanction', 'unsanction'].forEach(statusKey => {
+                    DIVISION_KEYS.forEach(divKey => {
+                        const tableKey = `${statusKey}-${divKey}`;
+                        const table = tables[tableKey];
+                        if (!table) return;
+                        table.on('draw', () => updateCountsForStatus(statusKey));
+                    });
+                });
+
                 // Bootstrap hides inactive tab-panes (display:none), which breaks DataTables'
                 // scrollX column-width math for whichever table is hidden at init time.
                 // Recalculate whenever a pane holding a table actually becomes visible.
@@ -422,17 +450,10 @@
                                 unsanction: data.filter(isUnSanctionRow)
                             };
 
-                            document.getElementById('count-sanction').textContent = byStatus.sanction.length;
-                            document.getElementById('count-unsanction').textContent = byStatus.unsanction.length;
-
                             ['sanction', 'unsanction'].forEach(statusKey => {
                                 DIVISION_KEYS.forEach(divKey => {
                                     const bucketRows = byStatus[statusKey].filter(r => divisionKeyFor(r) === divKey);
                                     const tableKey = `${statusKey}-${divKey}`;
-
-                                    const countEl = document.getElementById(`count-${tableKey}`);
-                                    if (countEl) countEl.textContent = bucketRows.length;
-
                                     if (tables[tableKey]) tables[tableKey].clear().rows.add(bucketRows).draw();
                                 });
                             });
