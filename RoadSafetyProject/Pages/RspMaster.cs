@@ -76,5 +76,7 @@ namespace RoadSafetyProject.Models
         public string RobRubWork { get; set; }        // ROB_RUB_WORK
         public string StatusOfWorks { get; set; }     // STATUS_OF_WORKS
 
+        public string Status { get; set; }
+
     }
 }

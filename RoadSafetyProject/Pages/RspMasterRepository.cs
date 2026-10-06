@@ -311,7 +311,8 @@ namespace RoadSafetyProject.Data
                 NoExit = GetString(r, "NO_EXIT"),
                 Design = GetString(r, "DESIGN"),
                 NocClosingLc = GetString(r, "NOC_CLOSING_LC"),
-                Soa = GetString(r, "SOA")
+                Soa = GetString(r, "SOA"),
+                Status = GetString(r, "STATUS"),
             };
         }
 
@@ -360,6 +361,22 @@ namespace RoadSafetyProject.Data
             return list;
         }
 
+        
+
+        public bool SetStatus(int id, string status)
+        {
+            using var conn = new OracleConnection(_connectionString);
+            conn.Open();
+
+            using var cmd = new OracleCommand(
+                "UPDATE RSP_MASTER SET STATUS = :status WHERE ID = :id", conn);
+
+            cmd.Parameters.Add(new OracleParameter("status", OracleDbType.Varchar2) { Value = (object)status ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("id", OracleDbType.Int32) { Value = id });
+
+            var rowsAffected = cmd.ExecuteNonQuery();
+            return rowsAffected > 0;
+        }
 
     }
 }

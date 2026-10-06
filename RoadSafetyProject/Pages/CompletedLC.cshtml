@@ -1,0 +1,203 @@
+@page
+@model RoadSafetyProject.Pages.CompletedLCModel
+@{
+    ViewData["Title"] = "Completed LC Records";
+}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<div class="content-wrapper">
+    <div class="container-fluid mb-4">
+        <div class="col-md-12">
+            <div class="form-card">
+                <div class="rob-sheet">
+
+                    <div class="rob-titleblock">
+                        <div>
+                            <div class="eyebrow">Railway Over Bridge · Project Data Sheet</div>
+                            <h1>Completed LC Records</h1>
+                        </div>
+                        <div class="rob-meta">
+                            <a href="viewalllc" class="btn btn-sm btn-light">&larr; All LC Records</a>
+                        </div>
+                    </div>
+
+                    <div id="recordsStatus" class="mb-2"></div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <input type="text" id="searchLcNo" class="form-control" placeholder="Search by LC No...">
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="completedTable" class="table table-bordered table-hover table-sm nowrap" style="width:100%"></table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- DataTables needs jQuery. Skip this if your _Layout.cshtml already loads it elsewhere. -->
+    <script>
+        if (typeof jQuery === 'undefined') {
+            document.write('<script src="https://code.jquery.com/jquery-3.7.1.min.js"><\/script>');
+        }
+    </script>
+
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
+    <!-- Excel export needs JSZip; PDF export needs pdfMake + its fonts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+    <script>
+        (function () {
+            const statusEl = document.getElementById('recordsStatus');
+
+            function setStatus(message, isError) {
+                if (!statusEl) return;
+                statusEl.textContent = message || '';
+                statusEl.className = 'mb-2 ' + (isError ? 'text-danger' : 'text-success');
+            }
+
+            function yn(v) { return v === 'Y' ? 'Yes' : (v === 'N' ? 'No' : (v || '')); }
+            function text(v) { return v == null ? '' : v; }
+
+            const columns = [
+                { data: 'id', title: 'ID' },
+                { data: 'lcStatus', title: 'LC Status', render: text },
+                { data: 'srNo', title: 'Sr No', render: text },
+                { data: 'projectName', title: 'Project Name', render: text },
+                { data: 'yearOfSanction', title: 'Year of Sanction', render: text },
+                { data: 'lcNo', name: 'lcNo', title: 'LC No.', render: text },
+                { data: 'locationKm', title: 'Location Km', render: text },
+                { data: 'division', title: 'Division', render: text },
+                { data: 'sectionName', title: 'Section', render: text },
+                { data: 'spanArrangement', title: 'Span Arrangement', render: text },
+                { data: 'skewAngle', title: 'Skew Angle', render: text },
+                { data: 'distanceExistingLc', title: 'Distance from Existing LC', render: text },
+                { data: 'stateAuthorityApproval', title: 'State Authority Approval', render: text },
+                { data: 'dprConsultancy', title: 'DPR Consultancy', render: text },
+                { data: 'executiveAgency', title: 'Executive Agency', render: text },
+                { data: 'gad', title: 'GAD', render: (v, type) => type === 'display' ? yn(v) : v },
+                { data: 'gadRemark', title: 'GAD Remark', render: text },
+                { data: 'checkedReceived', title: 'Checked & Received', render: (v, type) => type === 'display' ? yn(v) : v },
+                { data: 'checkedReceivedRemark', title: 'Checked & Received Remark', render: text },
+                { data: 'sanctionedCont', title: 'Sanctioned Cont (Cr)', render: text },
+                { data: 'sanctionedDe', title: 'Sanctioned DE (Cr)', render: text },
+                { data: 'tenderStatus', title: 'Status of Tender', render: text },
+                { data: 'lc7a37a', title: '7A / 37A', render: text },
+                { data: 'gazette20A', title: '20A Gazette', render: text },
+                { data: 'paper20A', title: '20A Paper', render: text },
+                { data: 'form20B', title: '20B', render: text },
+                { data: 'form20C', title: '20C', render: text },
+                { data: 'form20D', title: '20D', render: text },
+                { data: 'gazette20E', title: '20E Gazette', render: text },
+                { data: 'paper20E', title: '20E Paper', render: text },
+                { data: 'form20F', title: '20F', render: text },
+                { data: 'remark', title: 'Land Remark', render: text },
+                { data: 'stStatus', title: 'S & T', render: text },
+                { data: 'trdStatus', title: 'TRD', render: text },
+                { data: 'electricalG', title: 'Electrical (G)', render: text },
+                { data: 'substructureStatus', title: 'Substructure', render: text },
+                { data: 'superStructureStatus', title: 'Super Structure', render: text },
+                { data: 'commissioningStatus', title: 'Commissioning', render: text },
+                { data: 'gadExit', title: 'Exits / GAD', render: text },
+                { data: 'gadExitRemark', title: 'Exits / GAD Remark', render: text },
+                { data: 'exitNo', title: 'Exit No.', render: text },
+                { data: 'noExit', title: 'No Exit', render: text },
+                { data: 'design', title: 'Design', render: text },
+                { data: 'nocClosingLc', title: 'NOC of Closing LC', render: text },
+                { data: 'soa', title: 'SOA', render: text },
+                {
+                    data: 'status',
+                    title: 'Status',
+                    render: v => `<span class="badge bg-success">${v || 'Completed'}</span>`
+                }
+            ];
+
+            $(document).ready(function () {
+                const table = $('#completedTable').DataTable({
+                    ajax: {
+                        url: '?handler=List',
+                        dataSrc: function (json) {
+                            if (!json.success) {
+                                setStatus(json.message || 'Failed to load records.', true);
+                                return [];
+                            }
+                            return json.data;
+                        },
+                        error: function (xhr, error, thrown) {
+                            setStatus('Failed to load records: ' + thrown, true);
+                        }
+                    },
+                    columns: columns,
+                    scrollX: true,
+                    pageLength: 10,
+                    lengthMenu: [10, 25, 50, 100],
+                    dom: "<'row mb-2'<'col-sm-6'B><'col-sm-6'f>>rtip",
+                    buttons: [
+                        {
+                            extend: 'excelHtml5',
+                            text: '<i class="bi bi-file-earmark-excel-fill"></i>',
+                            titleAttr: 'Export to Excel',
+                            className: 'btn btn-sm btn-outline-success',
+                            title: 'RSP_MASTER_Completed_LC',
+                            exportOptions: { columns: ':visible' }
+                        },
+                        {
+                            extend: 'pdfHtml5',
+                            text: '<i class="bi bi-file-earmark-pdf-fill"></i>',
+                            titleAttr: 'Export to PDF',
+                            className: 'btn btn-sm btn-outline-danger',
+                            title: 'RSP_MASTER_Completed_LC',
+                            orientation: 'landscape',
+                            pageSize: 'A2',
+                            exportOptions: { columns: ':visible' }
+                        },
+                        {
+                            extend: 'print',
+                            text: '<i class="bi bi-printer-fill"></i>',
+                            titleAttr: 'Print',
+                            className: 'btn btn-sm btn-outline-secondary',
+                            title: 'RSP_MASTER_Completed_LC',
+                            exportOptions: { columns: ':visible' }
+                        },
+                        {
+                            extend: 'colvis',
+                            text: '<i class="bi bi-layout-three-columns"></i>',
+                            titleAttr: 'Show / hide columns',
+                            className: 'btn btn-sm btn-outline-primary'
+                        }
+                    ]
+                });
+
+                const lcNoSearch = document.getElementById('searchLcNo');
+                if (lcNoSearch) {
+                    let searchTimer;
+                    lcNoSearch.addEventListener('input', function () {
+                        const value = this.value;
+                        clearTimeout(searchTimer);
+                        searchTimer = setTimeout(() => {
+                            table.column('lcNo:name').search(value).draw();
+                        }, 200);
+                    });
+                }
+            });
+        })();
+    </script>
+}

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
@@ -6,11 +7,11 @@ using RoadSafetyProject.Data;
 
 namespace RoadSafetyProject.Pages
 {
-    public class viewalllcModel : PageModel
+    public class CompletedLCModel : PageModel
     {
         private readonly RspMasterRepository _repo;
 
-        public viewalllcModel(IConfiguration config)
+        public CompletedLCModel(IConfiguration config)
         {
             var connectionString = config.GetConnectionString("OracleDb");
             if (string.IsNullOrWhiteSpace(connectionString))
@@ -26,35 +27,23 @@ namespace RoadSafetyProject.Pages
         {
         }
 
-        // GET ?handler=List -> every RSP_MASTER row, for the DataTable to page/search/export
-        // client-side. All records are returned in one shot (no server paging) since the
-        // export buttons (Excel/PDF/Print) need the complete data set available in the browser.
+        // GET ?handler=List -> only records marked Status = "Completed" (via the
+        // "Complete LC" button on the viewalllc page), for the DataTable to
+        // page/search/export client-side.
         public JsonResult OnGetList()
         {
             try
             {
-                var items = _repo.GetAll();
+                var items = _repo.GetAll()
+                    .Where(x => !string.IsNullOrWhiteSpace(x.Status) &&
+                                x.Status.Trim().Equals("Completed", StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
                 return new JsonResult(new { success = true, data = items });
             }
             catch (Exception ex)
             {
                 return new JsonResult(new { success = false, message = "Failed to load records: " + ex.Message }) { StatusCode = 500 };
-            }
-        }
-
-        // POST ?handler=Complete&id=5 -> marks a record's Status as "Completed".
-        // Used by the "Complete LC" button in the Actions column.
-        [ValidateAntiForgeryToken]
-        public JsonResult OnPostComplete(int id)
-        {
-            try
-            {
-                var updated = _repo.SetStatus(id, "Completed");
-                return new JsonResult(new { success = updated, message = updated ? "LC marked as completed." : "Record not found." });
-            }
-            catch (Exception ex)
-            {
-                return new JsonResult(new { success = false, message = "Failed to mark LC as completed: " + ex.Message }) { StatusCode = 500 };
             }
         }
     }

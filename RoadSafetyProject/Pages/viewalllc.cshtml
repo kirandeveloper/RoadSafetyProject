@@ -22,6 +22,7 @@
         ("unsanction", "UnSanction"),
     };
 }
+@Html.AntiForgeryToken()
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
@@ -192,7 +193,20 @@
                     { data: 'noExit', title: 'No Exit', render: text },
                     { data: 'design', title: 'Design', render: text },
                     { data: 'nocClosingLc', title: 'NOC of Closing LC', render: text },
-                    { data: 'soa', title: 'SOA', render: text }
+                    { data: 'soa', title: 'SOA', render: text },
+                    {
+                        data: 'status',
+                        name: 'status',
+                        title: 'Actions',
+                        orderable: false,
+                        render: (v, type, row) => {
+                            if (type !== 'display') return v || '';
+                            const isCompleted = (v || '').toString().trim().toLowerCase() === 'completed';
+                            return isCompleted
+                                ? '<span class="badge bg-success">Completed</span>'
+                                : `<button type="button" class="btn btn-sm btn-outline-success complete-lc-btn" data-id="${row.id}">Complete LC</button>`;
+                        }
+                    }
                 ];
             }
 
@@ -467,6 +481,44 @@
                             }
                         })
                         .catch(err => setStatus('Failed to load records: ' + err.message, true));
+                }
+
+                // Complete LC: one delegated listener on the shared tab-content wrapper
+                // covers the button regardless of which of the 12 tables it's in.
+                const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                const statusTabsContent = document.getElementById('statusTabsContent');
+
+                if (statusTabsContent) {
+                    statusTabsContent.addEventListener('click', async function (e) {
+                        const btn = e.target.closest('.complete-lc-btn');
+                        if (!btn) return;
+
+                        const id = btn.getAttribute('data-id');
+                        if (!id) return;
+
+                        if (!confirm('Mark this LC as completed?')) return;
+
+                        btn.disabled = true;
+                        try {
+                            const response = await fetch(`?handler=Complete&id=${id}`, {
+                                method: 'POST',
+                                headers: { 'RequestVerificationToken': antiForgeryToken }
+                            });
+                            if (!response.ok) throw new Error('Request failed.');
+
+                            const json = await response.json();
+                            setStatus(json.message, !json.success);
+
+                            if (json.success) {
+                                await loadRecords();
+                            } else {
+                                btn.disabled = false;
+                            }
+                        } catch (err) {
+                            setStatus(err.message, true);
+                            btn.disabled = false;
+                        }
+                    });
                 }
 
                 loadRecords();
