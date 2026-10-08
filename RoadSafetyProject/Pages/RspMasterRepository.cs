@@ -40,7 +40,7 @@ namespace RoadSafetyProject.Data
                  FORM_20C, FORM_20D, GAZETTE_20E, PAPER_20E, FORM_20F, REMARK, ST_STATUS,
                  TRD_STATUS, ELECTRICAL_G, SUBSTRUCTURE_STATUS, SUPER_STRUCTURE_STATUS,
                  COMMISSIONING_STATUS, GAD_EXIT, EXITS_GAD_REMARK, DESIGN_STATUS, EXIT_NO, NO_EXIT, DESIGN,
-                 NOC_CLOSING_LC, SOA)
+                 NOC_CLOSING_LC, SOA, PDF_FILE_NAME)
                 VALUES
                 (RSP_MASTER_SEQ.NEXTVAL, :projectName, :nameOfWorks, :roadCategory, :robRubWork, :statusOfWorks,
                  :srNo, :yearOfSanction, :lcNo, :locationKm, :division, :lcStatus, :sectionName,
@@ -50,7 +50,7 @@ namespace RoadSafetyProject.Data
                  :form20C, :form20D, :gazette20E, :paper20E, :form20F, :remark, :stStatus,
                  :trdStatus, :electricalG, :substructureStatus, :superStructureStatus,
                  :commissioningStatus, :gadExit, :gadExitRemark, :designStatus, :exitNo, :noExit, :design,
-                 :nocClosingLc, :soa)
+                 :nocClosingLc, :soa, :pdfFileName)
                 RETURNING ID INTO :newId";
 
             using var conn = GetConnection();
@@ -143,7 +143,8 @@ namespace RoadSafetyProject.Data
                     NO_EXIT = :noExit,
                     DESIGN = :design,
                     NOC_CLOSING_LC = :nocClosingLc,
-                    SOA = :soa
+                    SOA = :soa,
+                    PDF_FILE_NAME = :pdfFileName
                 WHERE ID = :id";
 
             using var conn = GetConnection();
@@ -165,6 +166,56 @@ namespace RoadSafetyProject.Data
             }
 
             return m.Id;
+        }
+
+
+
+        // ---------- PDF FILE ----------
+        public bool UpdatePdfFileName(int id, string fileName)
+        {
+            const string sql = "UPDATE RSP_MASTER SET PDF_FILE_NAME = :pdfFileName WHERE ID = :id";
+
+            using var conn = GetConnection();
+            conn.Open();
+            using var cmd = new OracleCommand(sql, conn);
+
+            cmd.Parameters.Add(new OracleParameter("pdfFileName", OracleDbType.Varchar2)
+            {
+                Value = (object)fileName ?? DBNull.Value
+            });
+
+            cmd.Parameters.Add(new OracleParameter("id", OracleDbType.Int32)
+            {
+                Value = id
+            });
+
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
+        // ---------- WORKFLOW STATUS ----------
+        // Used by CompletedLC/viewalllc to mark an LC as Completed.
+        public bool SetStatus(int id, string status)
+        {
+            const string sql = @"
+                UPDATE RSP_MASTER
+                SET STATUS = :status
+                WHERE ID = :id";
+
+            using var conn = GetConnection();
+            conn.Open();
+            using var cmd = new OracleCommand(sql, conn);
+
+            cmd.Parameters.Add(new OracleParameter("status", OracleDbType.Varchar2)
+            {
+                Value = (object)status ?? DBNull.Value
+            });
+
+            cmd.Parameters.Add(new OracleParameter("id", OracleDbType.Int32)
+            {
+                Value = id
+            });
+
+            return cmd.ExecuteNonQuery() > 0;
         }
 
         // ---------- DELETE ----------
@@ -256,6 +307,7 @@ namespace RoadSafetyProject.Data
             cmd.Parameters.Add(new OracleParameter("design", OracleDbType.Varchar2) { Value = (object)m.Design ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("nocClosingLc", OracleDbType.Varchar2) { Value = (object)m.NocClosingLc ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("soa", OracleDbType.Varchar2) { Value = (object)m.Soa ?? DBNull.Value });
+            cmd.Parameters.Add(new OracleParameter("pdfFileName", OracleDbType.Varchar2) { Value = (object)m.PdfFileName ?? DBNull.Value });
         }
 
         private static RspMaster Map(IDataReader r)
@@ -263,6 +315,7 @@ namespace RoadSafetyProject.Data
             return new RspMaster
             {
                 Id = GetInt(r, "ID") ?? 0,
+                Status = GetString(r, "STATUS"),
                 ProjectName = GetString(r, "PROJECT_NAME"),
                 NameOfWorks = GetString(r, "NAME_OF_WORKS"),
                 RoadCategory = GetString(r, "ROAD_CATEGORY"),
@@ -312,7 +365,7 @@ namespace RoadSafetyProject.Data
                 Design = GetString(r, "DESIGN"),
                 NocClosingLc = GetString(r, "NOC_CLOSING_LC"),
                 Soa = GetString(r, "SOA"),
-                Status = GetString(r, "STATUS"),
+                PdfFileName = GetString(r, "PDF_FILE_NAME")
             };
         }
 
@@ -361,22 +414,6 @@ namespace RoadSafetyProject.Data
             return list;
         }
 
-        
-
-        public bool SetStatus(int id, string status)
-        {
-            using var conn = new OracleConnection(_connectionString);
-            conn.Open();
-
-            using var cmd = new OracleCommand(
-                "UPDATE RSP_MASTER SET STATUS = :status WHERE ID = :id", conn);
-
-            cmd.Parameters.Add(new OracleParameter("status", OracleDbType.Varchar2) { Value = (object)status ?? DBNull.Value });
-            cmd.Parameters.Add(new OracleParameter("id", OracleDbType.Int32) { Value = id });
-
-            var rowsAffected = cmd.ExecuteNonQuery();
-            return rowsAffected > 0;
-        }
 
     }
 }

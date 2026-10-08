@@ -144,6 +144,14 @@
 
             function text(v) { return v == null ? '' : v; }
 
+            function normalizeLcPdfName(lcNo) {
+                let v = (lcNo || '').toString().trim();
+                if (!v) return '';
+                if (!/^LC-/i.test(v)) v = 'LC-' + v;
+                v = v.replace(/[^A-Za-z0-9_-]/g, '_');
+                return v + '.pdf';
+            }
+
             // Shared column definitions, reused for all 12 tables. DataTables builds the
             // header row from `title` automatically since none of the <table> elements
             // has a hand-written <thead>.
@@ -167,7 +175,7 @@
                     { data: 'gad', title: 'GAD', render: (v, type) => type === 'display' ? yn(v) : v },
                     { data: 'gadRemark', title: 'GAD Remark', render: text },
                     { data: 'checkedReceived', title: 'Checked & Received', render: (v, type) => type === 'display' ? yn(v) : v },
-                    { data: 'checkedReceivedRemark', title: 'Checked & Received Remark', render: text },
+                    { data: 'checkedReceivedRemark', title: 'Detailed Estimation', render: text },
                     { data: 'sanctionedCont', title: 'Sanctioned Cont (Cr)', render: text },
                     { data: 'sanctionedDe', title: 'Sanctioned DE (Cr)', render: text },
                     { data: 'tenderStatus', title: 'Status of Tender', render: text },
@@ -206,6 +214,28 @@
                                 ? '<span class="badge bg-success">Completed</span>'
                                 : `<button type="button" class="btn btn-sm btn-outline-success complete-lc-btn" data-id="${row.id}">Complete LC</button>`;
                         }
+                    },
+                    {
+                        data: 'pdfFileName',
+                        name: 'pdfFileName',
+                        title: 'PDF',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center',
+                        render: (v, type, row) => {
+                            if (type !== 'display') return '';
+                            const fileName = v || (row.lcNo ? normalizeLcPdfName(row.lcNo) : '');
+                            if (!fileName) return '<span class="text-muted">—</span>';
+
+                            const url = '/pdf/LC/' + encodeURIComponent(fileName);
+
+                            return `<a href="${url}" target="_blank" rel="noopener"
+                                         class="btn btn-sm"
+                                         title="Open LC PDF"
+                                         aria-label="Open LC PDF">
+                                        <i class="bi bi-file-earmark-pdf-fill"></i>
+                                    </a>`;
+                        }
                     }
                 ];
             }
@@ -216,7 +246,7 @@
                         extend: 'excelHtml5',
                         text: '<i class="bi bi-file-earmark-excel-fill"></i>',
                         titleAttr: 'Export to Excel',
-                        className: 'btn btn-sm btn-outline-success',
+                        className: 'btn btn-sm',
                         title: filenamePrefix,
                         exportOptions: { columns: ':visible' }
                     },
@@ -224,7 +254,7 @@
                         extend: 'pdfHtml5',
                         text: '<i class="bi bi-file-earmark-pdf-fill"></i>',
                         titleAttr: 'Export to PDF',
-                        className: 'btn btn-sm btn-outline-danger',
+                        className: 'btn btn-sm',
                         title: filenamePrefix,
                         orientation: 'landscape',
                         pageSize: 'A2',
@@ -234,7 +264,7 @@
                         extend: 'print',
                         text: '<i class="bi bi-printer-fill"></i>',
                         titleAttr: 'Print',
-                        className: 'btn btn-sm btn-outline-secondary',
+                        className: 'btn btn-sm',
                         title: filenamePrefix,
                         exportOptions: { columns: ':visible' }
                     },
@@ -242,7 +272,7 @@
                         extend: 'colvis',
                         text: '<i class="bi bi-layout-three-columns"></i>',
                         titleAttr: 'Show / hide columns',
-                        className: 'btn btn-sm btn-outline-primary'
+                        className: 'btn btn-sm'
                     }
                 ];
             }

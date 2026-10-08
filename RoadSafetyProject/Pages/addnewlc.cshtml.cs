@@ -1,5 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
@@ -12,8 +17,9 @@ namespace RoadSafetyProject.Pages
     public class addnewlcModel : PageModel
     {
         private readonly RspMasterRepository _repo;
+        private readonly IWebHostEnvironment _env;
 
-        public addnewlcModel(IConfiguration config)
+        public addnewlcModel(IConfiguration config, IWebHostEnvironment env)
         {
             var connectionString = config.GetConnectionString("OracleDb");
             if (string.IsNullOrWhiteSpace(connectionString))
@@ -22,6 +28,7 @@ namespace RoadSafetyProject.Pages
                     "Check the 'ConnectionStrings' section and the key name.");
 
             _repo = new RspMasterRepository(connectionString);
+            _env = env;
         }
 
         // Renders the page. The form/table are populated client-side via AJAX.
@@ -100,6 +107,62 @@ namespace RoadSafetyProject.Pages
             {
                 return new JsonResult(new { success = false, message = "Delete failed: " + ex.Message }) { StatusCode = 500 };
             }
+        }
+
+
+        // POST ?handler=UploadPdf&id=5
+        // Saves the uploaded LC PDF to wwwroot/pdf/LC as LC-<LC_NO>.pdf.
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> OnPostUploadPdf(int id, IFormFile pdfFile)
+        {
+            if (id <= 0)
+                return new JsonResult(new { success = false, message = "Invalid LC record." }) { StatusCode = 400 };
+
+            if (pdfFile == null || pdfFile.Length == 0)
+                return new JsonResult(new { success = false, message = "Please select a PDF file." }) { StatusCode = 400 };
+
+            if (!string.Equals(Path.GetExtension(pdfFile.FileName), ".pdf", StringComparison.OrdinalIgnoreCase))
+                return new JsonResult(new { success = false, message = "Only PDF files are allowed." }) { StatusCode = 400 };
+
+            const long maxBytes = 20L * 1024L * 1024L;
+            if (pdfFile.Length > maxBytes)
+                return new JsonResult(new { success = false, message = "PDF size must not exceed 20 MB." }) { StatusCode = 400 };
+
+            var item = _repo.GetById(id);
+            if (item == null)
+                return new JsonResult(new { success = false, message = "LC record not found." }) { StatusCode = 404 };
+
+            if (string.IsNullOrWhiteSpace(item.LcNo))
+                return new JsonResult(new { success = false, message = "LC No. is required before uploading the PDF." }) { StatusCode = 400 };
+
+            var webRoot = _env.WebRootPath;
+            if (string.IsNullOrWhiteSpace(webRoot))
+                webRoot = Path.Combine(_env.ContentRootPath, "wwwroot");
+
+            var folder = Path.Combine(webRoot, "pdf", "LC");
+            Directory.CreateDirectory(folder);
+
+            var baseLc = item.LcNo.Trim();
+            if (!baseLc.StartsWith("LC-", StringComparison.OrdinalIgnoreCase))
+                baseLc = "LC-" + baseLc;
+
+            var safeName = Regex.Replace(baseLc, @"[^A-Za-z0-9_-]", "_") + ".pdf";
+            var fullPath = Path.Combine(folder, safeName);
+
+            await using (var stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                await pdfFile.CopyToAsync(stream);
+            }
+
+            _repo.UpdatePdfFileName(id, safeName);
+
+            return new JsonResult(new
+            {
+                success = true,
+                fileName = safeName,
+                url = "/pdf/LC/" + Uri.EscapeDataString(safeName),
+                message = "LC PDF uploaded successfully."
+            });
         }
 
         public JsonResult OnGetDivisionCounts()

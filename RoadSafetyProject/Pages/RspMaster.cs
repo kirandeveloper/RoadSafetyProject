@@ -11,6 +11,19 @@ namespace RoadSafetyProject.Models
         public int Id { get; set; }                      // ID (PK)
         public int? SrNo { get; set; }                    // SR_NO
 
+        // Work Details
+        public string NameOfWorks { get; set; }              // NAME_OF_WORKS
+        public string RoadCategory { get; set; }             // ROAD_CATEGORY
+        public string RobRubWork { get; set; }               // ROB_RUB_WORK
+        public string StatusOfWorks { get; set; }            // STATUS_OF_WORKS
+
+        // Completion / workflow status
+        public string Status { get; set; }                   // STATUS
+
+        // Uploaded LC PDF
+        public string PdfFileName { get; set; }              // PDF_FILE_NAME
+
+
         // 01 Basic Details
         public string YearOfSanction { get; set; }          // YEAR_OF_SANCTION
         public string LcNo { get; set; }                  // LC_NO
@@ -69,14 +82,6 @@ namespace RoadSafetyProject.Models
         public string GadExitRemark { get; set; }
 
         public string ProjectName { get; set; }
-
-        // Work Details
-        public string NameOfWorks { get; set; }       // NAME_OF_WORKS
-        public string RoadCategory { get; set; }      // ROAD_CATEGORY
-        public string RobRubWork { get; set; }        // ROB_RUB_WORK
-        public string StatusOfWorks { get; set; }     // STATUS_OF_WORKS
-
-        public string Status { get; set; }
 
     }
 }

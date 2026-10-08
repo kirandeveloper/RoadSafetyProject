@@ -489,6 +489,23 @@
 
                             </div>
                         </div>
+                        <!-- LC PDF Upload -->
+                        <div class="rob-panel">
+                            <div class="section-title">
+                                <span class="num">07</span>
+                                <span class="txt">LC PDF</span>
+                                <span class="sub">Upload official LC document</span>
+                            </div>
+                            <div class="row align-items-end">
+                                <div class="col-md-8 mb-3">
+                                    <label for="lcPdfFile" class="form-label fw-semibold">Upload LC PDF</label>
+                                    <input type="file" class="form-control" id="lcPdfFile" name="lcPdfFile" accept="application/pdf">
+                                    <div class="form-text">PDF only · Maximum 20 MB · Saved as LC-&lt;LC No.&gt;.pdf</div>
+                                    <div id="currentPdfWrap" class="mt-2"></div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- 06 NOC -->
                         <div class="rob-actions">
                             <button type="submit" class="btn-rob-primary" id="saveBtn">Save Details</button>
@@ -500,7 +517,7 @@
                     <!-- View / Manage records -->
                     <div class="rob-panel">
                         <div class="section-title">
-                            <span class="num">07</span>
+                            <span class="num">08</span>
                             <span class="txt">Saved LC Records</span>
                             <span class="sub">View · Edit · Delete</span>
                         </div>
@@ -576,6 +593,8 @@
             const form = document.getElementById('robForm');
             const status = document.getElementById('formStatus');
             const resetBtn = document.getElementById('resetBtn');
+            const lcPdfFile = document.getElementById('lcPdfFile');
+            const currentPdfWrap = document.getElementById('currentPdfWrap');
             const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
             // Yes/No selects that reveal a "why" remark textarea when the answer is "No".
@@ -799,6 +818,22 @@
                 form.querySelector('#nocClosingLc').value = record.nocClosingLc || '';
                 form.querySelector('#soa').value = record.soa || '';
 
+                if (currentPdfWrap) {
+                    if (record.pdfFileName) {
+                        const safeUrl = '/pdf/LC/' + encodeURIComponent(record.pdfFileName);
+                        currentPdfWrap.innerHTML =
+                            `<a href="${safeUrl}" target="_blank" rel="noopener" class="btn btn-sm">
+                                <i class="bi bi-file-earmark-pdf-fill"></i> Open current LC PDF
+                             </a>`;
+                    } else {
+                        currentPdfWrap.innerHTML = '<span class="text-muted">No LC PDF uploaded.</span>';
+                    }
+                }
+
+                // Browsers do not allow a file input to be populated programmatically.
+                if (lcPdfFile) lcPdfFile.value = '';
+
+
                 // Yes/No remark textareas: fill them in from the record, then sync
                 // each one's visibility (only shown when its select is "No").
                 form.querySelector('#gadRemark').value = record.gadRemark || '';
@@ -888,20 +923,45 @@
                 return (r.lcStatus || '').toString().trim().toLowerCase() === 'unsanction';
             }
 
+            function normalizeLcPdfName(lcNo) {
+                let v = (lcNo || '').toString().trim();
+                if (!v) return '';
+                if (!/^LC-/i.test(v)) v = 'LC-' + v;
+                v = v.replace(/[^A-Za-z0-9_-]/g, '_');
+                return v + '.pdf';
+            }
+
+            function pdfCell(record) {
+                const fileName = record.pdfFileName || (record.lcNo ? normalizeLcPdfName(record.lcNo) : '');
+                if (!fileName) return '<td class="text-center text-muted">—</td>';
+
+                const url = '/pdf/LC/' + encodeURIComponent(fileName);
+                return `<td class="text-center">
+                            <a href="${url}" target="_blank" rel="noopener"
+                               class="btn btn-sm"
+                               title="Open LC PDF"
+                               aria-label="Open LC PDF">
+                                <i class="bi bi-file-earmark-pdf-fill"></i>
+                            </a>
+                        </td>`;
+            }
+
             function buildRowsHtml(rows, columns) {
                 if (!rows.length) {
-                    return `<tr><td colspan="${columns.length + 1}" class="text-center text-muted">No records.</td></tr>`;
+                    return `<tr><td colspan="${columns.length + 2}" class="text-center text-muted">No records.</td></tr>`;
                 }
                 return rows.map(r => {
                     const cells = columns.map(c => `<td>${esc(c.fmt ? c.fmt(r[c.key]) : r[c.key])}</td>`).join('');
-                    return `<tr>${cells}${actionsCell(r.id)}</tr>`;
+                    return `<tr>${cells}${actionsCell(r.id)}${pdfCell(r)}</tr>`;
                 }).join('');
             }
 
             // uid must be unique per division+tab combination so nav/pane ids never collide
             // across the multiple division blocks and multiple category tabs rendered on the page.
             function buildDivisionTable(divisionName, rows, columns, uid, tabLabel) {
-                const headerCells = columns.map(c => `<th>${esc(c.label)}</th>`).join('') + '<th style="width:130px;">Actions</th>';
+                const headerCells = columns.map(c => `<th>${esc(c.label)}</th>`).join('')
+                    + '<th style="width:130px;">Actions</th>'
+                    + '<th style="width:70px;" class="text-center">PDF</th>';
 
                 const sanctionRows = rows.filter(r => !isUnSanctionRow(r));
                 const unsanctionRows = rows.filter(isUnSanctionRow);
@@ -1258,6 +1318,37 @@
                     const json = await res.json();
                     setStatus(json.message, !json.success);
                     if (json.success) {
+                        const savedId = json.id || payload.id;
+
+                        // Save the LC first, then upload the optional PDF against the saved ID.
+                        if (lcPdfFile && lcPdfFile.files && lcPdfFile.files.length > 0) {
+                            const pdfData = new FormData();
+                            pdfData.append('pdfFile', lcPdfFile.files[0]);
+
+                            try {
+                                const pdfRes = await fetch(
+                                    `?handler=UploadPdf&id=${encodeURIComponent(savedId)}`,
+                                    {
+                                        method: 'POST',
+                                        headers: {
+                                            'RequestVerificationToken': antiForgeryToken
+                                        },
+                                        body: pdfData
+                                    }
+                                );
+
+                                const pdfJson = await pdfRes.json();
+
+                                if (!pdfJson.success) {
+                                    setStatus('LC saved, but PDF upload failed: ' + pdfJson.message, true);
+                                } else {
+                                    setStatus('LC and PDF saved successfully.', false);
+                                }
+                            } catch (pdfErr) {
+                                setStatus('LC saved, but PDF upload failed: ' + pdfErr.message, true);
+                            }
+                        }
+
                         form.reset();
                         form.classList.remove('was-validated');
                         document.getElementById('recordId').value = 0;
@@ -1273,6 +1364,8 @@
                 form.reset();
                 form.classList.remove('was-validated');
                 document.getElementById('recordId').value = 0;
+                if (lcPdfFile) lcPdfFile.value = '';
+                if (currentPdfWrap) currentPdfWrap.innerHTML = '';
                 ['gad', 'checkedReceived', 'exitsGad'].forEach(syncYesNoRemark);
                 setStatus('', false);
             });
