@@ -1650,6 +1650,73 @@ iframe {
 	font-size: 1.8rem;
 }
 
+.monthly-page {
+	padding: 20px 0 40px
+}
+
+.page-heading {
+	background: linear-gradient(135deg, #0a1f3e, #084298);
+	color: white;
+	padding: 18px 22px;
+	border-radius: 8px;
+	margin-bottom: 20px
+}
+
+.panel {
+	background: white;
+	border: 1px solid #dee2e6;
+	border-radius: 8px;
+	padding: 20px;
+	margin-bottom: 22px
+}
+
+.section-heading {
+	font-size: 18px;
+	font-weight: 600;
+	color: #0d6efd;
+	border-bottom: 2px solid #0d6efd;
+	padding-bottom: 8px;
+	margin-bottom: 18px
+}
+
+.form-label {
+	font-size: 13px;
+	font-weight: 600
+}
+
+#monthlyLcStatusTable {
+	width: 100% !important;
+	font-size: 13px
+}
+
+	#monthlyLcStatusTable th {
+		white-space: nowrap;
+		text-align: center;
+		vertical-align: middle
+	}
+
+.filter-panel {
+	background: #f8f9fa;
+	border: 1px solid #dee2e6;
+	border-radius: 6px;
+	padding: 15px;
+	margin-bottom: 18px
+}
+
+.action-buttons {
+	white-space: nowrap
+}
+
+	.action-buttons .btn {
+		margin-right: 3px
+	}
+
+.status-message {
+	display: none;
+	margin-top: 15px
+}
+
+
 /* ===========================
    Tablet
 =========================== */
@@ -1733,6 +1800,17 @@ iframe {
 	 .table-row:hover{
         background:#f8f9fa;
     }
+	.monthly-page {
+		padding: 10px 0 25px
+	}
+
+	.panel {
+		padding: 12px
+	}
+
+	.page-heading h2 {
+		font-size: 20px
+	}
 }
 
 @media(max-width:767px){

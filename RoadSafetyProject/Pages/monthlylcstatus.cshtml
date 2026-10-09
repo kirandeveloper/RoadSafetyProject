@@ -1,0 +1,250 @@
+﻿@page
+@model RoadSafetyProject.Pages.monthlylcstatusModel
+@{
+    ViewData["Title"] = "Monthly LC Status";
+}
+<style>
+    
+</style>
+
+<div class="container-fluid monthly-page">
+    <div class="page-heading">
+        <h2>Monthly LC Status</h2>
+        <p class="mb-0 mt-1">Manage monthly Level Crossing status records.</p>
+    </div>
+
+    <div class="panel">
+        <div class="section-heading">Add / Update Monthly LC Status</div>
+        <form id="monthlyLcStatusForm">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="Id" value="0" />
+            <div class="row g-3">
+                <div class="col-md-2"><label class="form-label" for="LcNo">LC No. *</label><input type="number" class="form-control" id="LcNo" min="1" required /></div>
+                <div class="col-md-2"><label class="form-label" for="Division">Division</label><input class="form-control" id="Division" /></div>
+                <div class="col-md-4"><label class="form-label" for="LcName">Name</label><input class="form-control" id="LcName" /></div>
+                <div class="col-md-4"><label class="form-label" for="Section">Section</label><input class="form-control" id="Section" /></div>
+                <div class="col-md-2"><label class="form-label" for="Km">KM</label><input class="form-control" id="Km" /></div>
+                <div class="col-md-5"><label class="form-label" for="ExecutingAgencyRailway">Executing Agency (Railway Portion)</label><textarea class="form-control" id="ExecutingAgencyRailway"></textarea></div>
+                <div class="col-md-5"><label class="form-label" for="ExecutingAgencyApproach">Executing Agency (Approach Portion)</label><textarea class="form-control" id="ExecutingAgencyApproach"></textarea></div>
+                <div class="col-md-3"><label class="form-label" for="RoadType">Type of Road</label><select class="form-select" id="RoadType"><option value="">-- Select --</option><option>NH</option><option>SH</option><option>MDR</option><option>ODR</option><option>MR</option><option>VR</option><option>DR</option></select></div>
+                <div class="col-md-5"><label class="form-label" for="WorkHeldUpReason">Work Held Up Due To</label><select class="form-select" id="WorkHeldUpReason"><option value="">-- Select --</option><option>Land Acquisition</option><option>Public Protest</option><option>Consent of Closure</option><option>Other</option></select></div>
+                <div class="col-md-2"><label class="form-label" for="RlyProgress">% Progress Rly Portion</label><input class="form-control" id="RlyProgress" placeholder="e.g. 45%" /></div>
+                <div class="col-md-2"><label class="form-label" for="ApproachProgress">% Progress Approaches</label><input class="form-control" id="ApproachProgress" placeholder="e.g. 60%" /></div>
+                <div class="col-md-3"><label class="form-label" for="StatusAsOnDate">Up to Date</label><input type="date" class="form-control" id="StatusAsOnDate" /></div>
+                <div class="col-md-3"><label class="form-label" for="WorkStatusWeek1">Work Status Week 1</label><textarea class="form-control" id="WorkStatusWeek1"></textarea></div>
+                <div class="col-md-3"><label class="form-label" for="WorkStatusWeek2">Work Status Week 2</label><textarea class="form-control" id="WorkStatusWeek2"></textarea></div>
+                <div class="col-md-3"><label class="form-label" for="WorkStatusWeek3">Work Status Week 3</label><textarea class="form-control" id="WorkStatusWeek3"></textarea></div>
+                <div class="col-md-3"><label class="form-label" for="WorkStatusWeek4">Work Status Week 4</label><textarea class="form-control" id="WorkStatusWeek4"></textarea></div>
+            </div>
+            <div class="mt-4 pt-3 border-top"><button type="submit" class="btn btn-primary" id="saveBtn">Save</button> <button type="button" class="btn btn-secondary" id="resetBtn">Reset</button></div>
+            <div id="formStatus" class="alert status-message" role="alert"></div>
+        </form>
+    </div>
+
+    <div class="panel">
+        <div class="section-heading">Monthly LC Status Records</div>
+        <div class="filter-panel">
+            <div class="fw-semibold mb-2">Filters</div>
+            <div class="row g-3">
+                <div class="col-md-2"><label class="form-label" for="filterYear">Year</label><select class="form-select" id="filterYear"><option value="">All Years</option></select></div>
+                <div class="col-md-2"><label class="form-label" for="filterMonth">Month</label><select class="form-select" id="filterMonth"><option value="">All Months</option><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></div>
+                <div class="col-md-2"><label class="form-label" for="filterWeek">Week</label><select class="form-select" id="filterWeek"><option value="">All Weeks</option><option value="1">Week 1</option><option value="2">Week 2</option><option value="3">Week 3</option><option value="4">Week 4</option></select></div>
+                <div class="col-md-3"><label class="form-label" for="filterDate">Exact Date</label><input type="date" class="form-control" id="filterDate" /></div>
+                <div class="col-md-3 d-flex align-items-end"><button type="button" class="btn btn-outline-secondary" id="resetFilters">Clear Filters</button></div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table id="monthlyLcStatusTable" class="table table-bordered table-striped table-hover nowrap">
+                <thead>
+                    <tr>
+                        <th>Sr No.</th>
+                        <th>LC No.</th>
+                        <th>Division</th>
+                        <th>Name</th>
+                        <th>Section</th>
+                        <th>KM</th>
+                        <th>Executing Agency (Railway Portion)</th>
+                        <th>Executing Agency (Approach Portion)</th>
+                        <th>Type of Road</th>
+                        <th>Work Held Up Due To</th>
+                        <th>% Progress Rly Portion</th>
+                        <th>% Progress Approaches</th>
+                        <th>Up to Date</th>
+                        <th>Work Status Week 1</th>
+                        <th>Work Status Week 2</th>
+                        <th>Work Status Week 3</th>
+                        <th>Work Status Week 4</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @* jQuery must be loaded once in _Layout.cshtml before these scripts. *@
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script>
+        $(function () {
+            if (!window.jQuery || !$.fn.DataTable) {
+                console.error("DataTables is unavailable. Ensure jQuery is loaded once before DataTables.");
+                return;
+            }
+
+            const token = $('input[name="__RequestVerificationToken"]').val() || "";
+            const form = document.getElementById("monthlyLcStatusForm");
+            const statusBox = document.getElementById("formStatus");
+            const saveBtn = document.getElementById("saveBtn");
+
+            function message(text, error) {
+                statusBox.className = "alert status-message " + (error ? "alert-danger" : "alert-success");
+                statusBox.textContent = text || (error ? "Operation failed." : "Operation completed.");
+                statusBox.style.display = "block";
+                setTimeout(() => statusBox.style.display = "none", 5000);
+            }
+            function dateObj(value) {
+                if (!value) return null;
+                const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+                if (m) return new Date(+m[1], +m[2] - 1, +m[3]);
+                const d = new Date(value);
+                return Number.isNaN(d.getTime()) ? null : d;
+            }
+            function inputDate(value) {
+                const d = dateObj(value);
+                return d ? `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}` : "";
+            }
+            function displayDate(value) {
+                const d = dateObj(value);
+                return d ? `${String(d.getDate()).padStart(2,"0")}-${String(d.getMonth()+1).padStart(2,"0")}-${d.getFullYear()}` : (value || "");
+            }
+
+            const table = $("#monthlyLcStatusTable").DataTable({
+                ajax: {
+                    url: "?handler=List", type: "GET",
+                    dataSrc: function (json) {
+                        if (!json || !json.success) { message((json && json.message) || "Could not load records.", true); return []; }
+                        return json.data || [];
+                    },
+                    error: function (xhr) { console.error(xhr.responseText); message("Could not load records. Check Oracle connection and server logs.", true); }
+                },
+                processing: true, scrollX: true, autoWidth: false, pageLength: 10,
+                lengthMenu: [[10,25,50,100,-1],[10,25,50,100,"All"]],
+                dom: "<'row mb-2'<'col-md-7'B><'col-md-5'f>>rt<'row mt-2'<'col-md-5'l><'col-md-7'p>>",
+                buttons: [
+                    { extend: "excelHtml5", text: "Excel", className: "btn btn-success btn-sm", title: "Monthly LC Status", filename: "Monthly_LC_Status", exportOptions: { columns: ":not(:last-child)" } },
+                    { extend: "pdfHtml5", text: "PDF", className: "btn btn-danger btn-sm", title: "Monthly LC Status", filename: "Monthly_LC_Status", orientation: "landscape", pageSize: "A3", exportOptions: { columns: ":not(:last-child)" }, customize: function (doc) { doc.defaultStyle.fontSize = 6; doc.styles.tableHeader.fontSize = 7; doc.pageMargins = [12,18,12,18]; } },
+                    { extend: "print", text: "Print", className: "btn btn-primary btn-sm", title: "Monthly LC Status", exportOptions: { columns: ":not(:last-child)" } }
+                ],
+                columns: [
+                    { data: null, orderable: false, searchable: false, render: (d,t,r,m) => m.row + m.settings._iDisplayStart + 1 },
+                    { data: "lcNo", defaultContent: "" }, { data: "division", defaultContent: "" }, { data: "lcName", defaultContent: "" },
+                    { data: "section", defaultContent: "" }, { data: "km", defaultContent: "" },
+                    { data: "executingAgencyRailway", defaultContent: "" }, { data: "executingAgencyApproach", defaultContent: "" },
+                    { data: "roadType", defaultContent: "" }, { data: "workHeldUpReason", defaultContent: "" },
+                    { data: "rlyProgress", defaultContent: "" }, { data: "approachProgress", defaultContent: "" },
+                    { data: "statusAsOnDate", defaultContent: "", render: (v,t) => t === "display" ? displayDate(v) : (v || "") },
+                    { data: "workStatusWeek1", defaultContent: "" }, { data: "workStatusWeek2", defaultContent: "" },
+                    { data: "workStatusWeek3", defaultContent: "" }, { data: "workStatusWeek4", defaultContent: "" },
+                    { data: null, orderable: false, searchable: false, render: (d,t,r) => `<div class="action-buttons"><button type="button" class="btn btn-warning btn-sm edit-btn" data-id="${Number(r.id)}">Edit</button><button type="button" class="btn btn-danger btn-sm delete-btn" data-id="${Number(r.id)}">Delete</button></div>` }
+                ],
+                order: [[1,"asc"]]
+            });
+
+            function refreshYears() {
+                const select = document.getElementById("filterYear"), old = select.value, years = new Set();
+                table.rows().every(function () { const row = this.data(), d = row ? dateObj(row.statusAsOnDate) : null; if (d) years.add(d.getFullYear()); });
+                select.innerHTML = '<option value="">All Years</option>';
+                Array.from(years).sort((a,b)=>b-a).forEach(y => { const o = document.createElement("option"); o.value = y; o.textContent = y; select.appendChild(o); });
+                select.value = old;
+            }
+            table.on("xhr.dt", () => setTimeout(refreshYears, 0));
+            table.on("draw.dt", refreshYears);
+
+            $.fn.dataTable.ext.search.push(function (settings, data, index) {
+                if (!settings.nTable || settings.nTable.id !== "monthlyLcStatusTable") return true;
+                const row = table.row(index).data();
+                if (!row) return true;
+                const year = $("#filterYear").val(), month = $("#filterMonth").val(), week = $("#filterWeek").val(), exact = $("#filterDate").val();
+                const d = dateObj(row.statusAsOnDate);
+                if ((year || month || exact) && !d) return false;
+                if (year && String(d.getFullYear()) !== year) return false;
+                if (month && String(d.getMonth()+1) !== month) return false;
+                if (exact && inputDate(row.statusAsOnDate) !== exact) return false;
+                if (week && !(row["workStatusWeek" + week] || "").toString().trim()) return false;
+                return true;
+            });
+            $("#filterYear,#filterMonth,#filterWeek,#filterDate").on("change", () => table.draw());
+            $("#resetFilters").on("click", () => { $("#filterYear,#filterMonth,#filterWeek,#filterDate").val(""); table.search("").draw(); });
+
+            function resetForm() { form.reset(); $("#Id").val("0"); saveBtn.textContent = "Save"; }
+            $("#resetBtn").on("click", resetForm);
+
+            $("#monthlyLcStatusForm").on("submit", function (e) {
+                e.preventDefault();
+                const lcNo = Number($("#LcNo").val());
+                if (!Number.isInteger(lcNo) || lcNo <= 0) { message("Please enter a valid LC No.", true); $("#LcNo").trigger("focus"); return; }
+                const model = {
+                    id: Number($("#Id").val() || 0), lcNo,
+                    division: $("#Division").val(), lcName: $("#LcName").val(), section: $("#Section").val(), km: $("#Km").val(),
+                    executingAgencyRailway: $("#ExecutingAgencyRailway").val(), executingAgencyApproach: $("#ExecutingAgencyApproach").val(),
+                    roadType: $("#RoadType").val(), workHeldUpReason: $("#WorkHeldUpReason").val(), rlyProgress: $("#RlyProgress").val(),
+                    approachProgress: $("#ApproachProgress").val(), statusAsOnDate: $("#StatusAsOnDate").val() || null,
+                    workStatusWeek1: $("#WorkStatusWeek1").val(), workStatusWeek2: $("#WorkStatusWeek2").val(),
+                    workStatusWeek3: $("#WorkStatusWeek3").val(), workStatusWeek4: $("#WorkStatusWeek4").val()
+                };
+                saveBtn.disabled = true; saveBtn.textContent = "Saving...";
+                $.ajax({
+                    url: "?handler=Save", method: "POST", contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(model), headers: { "RequestVerificationToken": token },
+                    success: function (r) {
+                        if (r && r.success) { message(r.message || "Saved successfully.", false); resetForm(); table.ajax.reload(refreshYears, false); }
+                        else message((r && r.message) || "Save failed.", true);
+                    },
+                    error: function (xhr) {
+                        console.error("Save failed:", xhr.responseText);
+                        message(xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : "Save failed. Check Network response and server logs.", true);
+                    },
+                    complete: function () { saveBtn.disabled = false; saveBtn.textContent = Number($("#Id").val() || 0) > 0 ? "Update" : "Save"; }
+                });
+            });
+
+            $("#monthlyLcStatusTable tbody").on("click", ".edit-btn", function () {
+                const row = table.row($(this).closest("tr")).data();
+                if (!row) { message("Selected row was not found.", true); return; }
+                $("#Id").val(row.id || 0); $("#LcNo").val(row.lcNo || ""); $("#Division").val(row.division || "");
+                $("#LcName").val(row.lcName || ""); $("#Section").val(row.section || ""); $("#Km").val(row.km || "");
+                $("#ExecutingAgencyRailway").val(row.executingAgencyRailway || ""); $("#ExecutingAgencyApproach").val(row.executingAgencyApproach || "");
+                $("#RoadType").val(row.roadType || ""); $("#WorkHeldUpReason").val(row.workHeldUpReason || "");
+                $("#RlyProgress").val(row.rlyProgress || ""); $("#ApproachProgress").val(row.approachProgress || "");
+                $("#StatusAsOnDate").val(inputDate(row.statusAsOnDate)); $("#WorkStatusWeek1").val(row.workStatusWeek1 || "");
+                $("#WorkStatusWeek2").val(row.workStatusWeek2 || ""); $("#WorkStatusWeek3").val(row.workStatusWeek3 || "");
+                $("#WorkStatusWeek4").val(row.workStatusWeek4 || ""); saveBtn.textContent = "Update";
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+
+            $("#monthlyLcStatusTable tbody").on("click", ".delete-btn", function () {
+                const id = Number($(this).data("id"));
+                if (!id || !confirm("Are you sure you want to delete this record?")) return;
+                $.ajax({
+                    url: "?handler=Delete&id=" + encodeURIComponent(id), method: "POST",
+                    headers: { "RequestVerificationToken": token },
+                    success: function (r) {
+                        if (r && r.success) { message(r.message || "Deleted successfully.", false); table.ajax.reload(refreshYears, false); if (Number($("#Id").val()) === id) resetForm(); }
+                        else message((r && r.message) || "Delete failed.", true);
+                    },
+                    error: function (xhr) { console.error("Delete failed:", xhr.responseText); message("Delete failed. Check server response and logs.", true); }
+                });
+            });
+        });
+    </script>
+}
