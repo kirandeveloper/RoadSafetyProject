@@ -39,6 +39,7 @@ namespace RoadSafetyProject.Repositories
                     EXECUTING_AGENCY_APPROACH,
                     ROAD_TYPE,
                     WORK_HELD_UP_REASON,
+                    WORK_HELD_UP_OTHER_REASON,
                     RLY_PROGRESS,
                     APPROACH_PROGRESS,
                     STATUS_AS_ON_DATE,
@@ -83,6 +84,7 @@ namespace RoadSafetyProject.Repositories
                     EXECUTING_AGENCY_APPROACH,
                     ROAD_TYPE,
                     WORK_HELD_UP_REASON,
+                    WORK_HELD_UP_OTHER_REASON,
                     RLY_PROGRESS,
                     APPROACH_PROGRESS,
                     STATUS_AS_ON_DATE,
@@ -134,6 +136,7 @@ namespace RoadSafetyProject.Repositories
                     EXECUTING_AGENCY_APPROACH,
                     ROAD_TYPE,
                     WORK_HELD_UP_REASON,
+                    WORK_HELD_UP_OTHER_REASON,
                     RLY_PROGRESS,
                     APPROACH_PROGRESS,
                     STATUS_AS_ON_DATE,
@@ -154,6 +157,7 @@ namespace RoadSafetyProject.Repositories
                     :approachAgency,
                     :roadType,
                     :workHeldUpReason,
+                    :workHeldUpOtherReason,
                     :rlyProgress,
                     :approachProgress,
                     :statusDate,
@@ -206,6 +210,7 @@ namespace RoadSafetyProject.Repositories
                     EXECUTING_AGENCY_APPROACH = :approachAgency,
                     ROAD_TYPE = :roadType,
                     WORK_HELD_UP_REASON = :workHeldUpReason,
+                    WORK_HELD_UP_OTHER_REASON = :workHeldUpOtherReason,
                     RLY_PROGRESS = :rlyProgress,
                     APPROACH_PROGRESS = :approachProgress,
                     STATUS_AS_ON_DATE = :statusDate,
@@ -314,6 +319,12 @@ namespace RoadSafetyProject.Repositories
             ).Value = DbValue(
                 m.WorkHeldUpReason
             );
+
+            cmd.Parameters.Add(
+                "workHeldUpOtherReason",
+                OracleDbType.Varchar2,
+                1000
+            ).Value = DbValue(m.WorkHeldUpOtherReason);
 
             // IMPORTANT:
             // Oracle column is VARCHAR2(500)
@@ -425,6 +436,11 @@ namespace RoadSafetyProject.Repositories
                         r,
                         "WORK_HELD_UP_REASON"
                     ),
+
+                WorkHeldUpOtherReason = GetString(
+                    r,
+                    "WORK_HELD_UP_OTHER_REASON"
+                ),
 
                 RlyProgress =
                     GetString(

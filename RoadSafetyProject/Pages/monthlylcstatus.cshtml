@@ -3,8 +3,87 @@
 @{
     ViewData["Title"] = "Monthly LC Status";
 }
+
+<!-- DataTables styles: these are required for the export buttons and table controls to display correctly. -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" />
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
 <style>
-    
+    /* Print / Excel / PDF: clickable icon links only, no button chrome */
+    /* Remove button background and make width fit the icon */
+    .dt-buttons .dt-button.dt-action-link,
+    .dt-buttons button.dt-action-link,
+    .dt-buttons a.dt-action-link {
+        width: 30px !important;
+        min-width: 0 !important;
+        height: auto !important;
+        padding: 2px 5px !important;
+        margin: 0 5px 0 0 !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+        border-radius: 0 !important;
+        text-decoration: none !important;
+    }
+
+    .dt-buttons{
+        display:block !important;
+    }
+
+    /* Icon size */
+    .dt-action-link i {
+        display: inline-block;
+        font-size: 25px !important;
+        line-height: 1 !important;
+    }
+
+    /* Icon colors */
+    .dt-action-link.print-icon i {
+        color: #143b70 !important;
+    }
+
+    .dt-action-link.excel-icon i {
+        color: #00b51a !important;
+    }
+
+    .dt-action-link.pdf-icon i {
+        color: #e53935 !important;
+    }
+
+    /* Prevent background on hover, focus and active */
+    .dt-buttons .dt-button.dt-action-link:hover,
+    .dt-buttons .dt-button.dt-action-link:focus,
+    .dt-buttons .dt-button.dt-action-link:active {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        opacity: 0.75;
+    }
+    .dt-buttons .buttons-excel{
+       background: none !important;
+    }
+    .dt-buttons .buttons-pdf{
+        background: none !important;
+    }
+    .dt-buttons .buttons-print{
+        background: none !important;
+    }
+    .fa-file-excel{
+      color: #08a508;
+      font-size: 1.8rem;
+    }
+    .fa-file-pdf{
+        color: #dc3535;
+        font-size: 1.8rem;
+    }
+    .fa-print{
+        color: #14315c;
+        font-size: 1.8rem;
+    }
+
 </style>
 
 <div class="container-fluid monthly-page">
@@ -27,7 +106,33 @@
                 <div class="col-md-5"><label class="form-label" for="ExecutingAgencyRailway">Executing Agency (Railway Portion)</label><textarea class="form-control" id="ExecutingAgencyRailway"></textarea></div>
                 <div class="col-md-5"><label class="form-label" for="ExecutingAgencyApproach">Executing Agency (Approach Portion)</label><textarea class="form-control" id="ExecutingAgencyApproach"></textarea></div>
                 <div class="col-md-3"><label class="form-label" for="RoadType">Type of Road</label><select class="form-select" id="RoadType"><option value="">-- Select --</option><option>NH</option><option>SH</option><option>MDR</option><option>ODR</option><option>MR</option><option>VR</option><option>DR</option></select></div>
-                <div class="col-md-5"><label class="form-label" for="WorkHeldUpReason">Work Held Up Due To</label><select class="form-select" id="WorkHeldUpReason"><option value="">-- Select --</option><option>Land Acquisition</option><option>Public Protest</option><option>Consent of Closure</option><option>Other</option></select></div>
+                <div class="col-md-5">
+                    <label class="form-label" for="WorkHeldUpReason">
+                        Work Held Up Due To
+                    </label>
+
+                    <select class="form-select" id="WorkHeldUpReason">
+                        <option value="">-- Select --</option>
+                        <option value="Land Acquisition">Land Acquisition</option>
+                        <option value="Public Protest">Public Protest</option>
+                        <option value="Consent of Closure">Consent of Closure</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="col-md-5" id="otherReasonContainer" style="display: none;">
+                    <label class="form-label" for="WorkHeldUpOtherReason">
+                        Specify Other Reason *
+                    </label>
+
+                    <textarea class="form-control"
+                              id="WorkHeldUpOtherReason"
+                              rows="3"
+                              maxlength="1000"
+                              placeholder="Enter the reason work is held up"></textarea>
+
+                    <span class="text-danger" id="otherReasonError"></span>
+                </div>
                 <div class="col-md-2"><label class="form-label" for="RlyProgress">% Progress Rly Portion</label><input class="form-control" id="RlyProgress" placeholder="e.g. 45%" /></div>
                 <div class="col-md-2"><label class="form-label" for="ApproachProgress">% Progress Approaches</label><input class="form-control" id="ApproachProgress" placeholder="e.g. 60%" /></div>
                 <div class="col-md-3"><label class="form-label" for="StatusAsOnDate">Up to Date</label><input type="date" class="form-control" id="StatusAsOnDate" /></div>
@@ -141,9 +246,9 @@
                 lengthMenu: [[10,25,50,100,-1],[10,25,50,100,"All"]],
                 dom: "<'row mb-2'<'col-md-7'B><'col-md-5'f>>rt<'row mt-2'<'col-md-5'l><'col-md-7'p>>",
                 buttons: [
-                    { extend: "excelHtml5", text: "Excel", className: "btn btn-success btn-sm", title: "Monthly LC Status", filename: "Monthly_LC_Status", exportOptions: { columns: ":not(:last-child)" } },
-                    { extend: "pdfHtml5", text: "PDF", className: "btn btn-danger btn-sm", title: "Monthly LC Status", filename: "Monthly_LC_Status", orientation: "landscape", pageSize: "A3", exportOptions: { columns: ":not(:last-child)" }, customize: function (doc) { doc.defaultStyle.fontSize = 6; doc.styles.tableHeader.fontSize = 7; doc.pageMargins = [12,18,12,18]; } },
-                    { extend: "print", text: "Print", className: "btn btn-primary btn-sm", title: "Monthly LC Status", exportOptions: { columns: ":not(:last-child)" } }
+                    { extend: "excelHtml5", text: '<i class="fa-solid fa-file-excel me-1" aria-hidden="true"></i> Export Excel', className: "btn btn-success btn-sm me-2", title: "Monthly LC Status", filename: "Monthly_LC_Status", exportOptions: { columns: ":not(:last-child)" } },
+                    { extend: "pdfHtml5", text: '<i class="fa-solid fa-file-pdf me-1" aria-hidden="true"></i> Export PDF', className: "btn btn-danger btn-sm me-2", title: "Monthly LC Status", filename: "Monthly_LC_Status", orientation: "landscape", pageSize: "A3", exportOptions: { columns: ":not(:last-child)" }, customize: function (doc) { doc.defaultStyle.fontSize = 6; doc.styles.tableHeader.fontSize = 7; doc.pageMargins = [12,18,12,18]; } },
+                    { extend: "print", text: '<i class="fa-solid fa-print me-1" aria-hidden="true"></i> Print', className: "btn btn-primary btn-sm", title: "Monthly LC Status", exportOptions: { columns: ":not(:last-child)" } }
                 ],
                 columns: [
                     { data: null, orderable: false, searchable: false, render: (d,t,r,m) => m.row + m.settings._iDisplayStart + 1 },
@@ -155,7 +260,7 @@
                     { data: "statusAsOnDate", defaultContent: "", render: (v,t) => t === "display" ? displayDate(v) : (v || "") },
                     { data: "workStatusWeek1", defaultContent: "" }, { data: "workStatusWeek2", defaultContent: "" },
                     { data: "workStatusWeek3", defaultContent: "" }, { data: "workStatusWeek4", defaultContent: "" },
-                    { data: null, orderable: false, searchable: false, render: (d,t,r) => `<div class="action-buttons"><button type="button" class="btn btn-warning btn-sm edit-btn" data-id="${Number(r.id)}">Edit</button><button type="button" class="btn btn-danger btn-sm delete-btn" data-id="${Number(r.id)}">Delete</button></div>` }
+                    { data: null, orderable: false, searchable: false, render: (d,t,r) => `<div class="action-buttons"><button type="button" class="btn btn-warning btn-sm edit-btn" data-id="${Number(r.id)}" title="Edit record"><i class="fa-solid fa-pen-to-square me-1" aria-hidden="true"></i>Edit</button> <button type="button" class="btn btn-danger btn-sm delete-btn" data-id="${Number(r.id)}" title="Delete record"><i class="fa-solid fa-trash me-1" aria-hidden="true"></i>Delete</button></div>` }
                 ],
                 order: [[1,"asc"]]
             });
@@ -186,18 +291,38 @@
             $("#filterYear,#filterMonth,#filterWeek,#filterDate").on("change", () => table.draw());
             $("#resetFilters").on("click", () => { $("#filterYear,#filterMonth,#filterWeek,#filterDate").val(""); table.search("").draw(); });
 
-            function resetForm() { form.reset(); $("#Id").val("0"); saveBtn.textContent = "Save"; }
+            function resetForm() {
+                form.reset();
+
+                $("#Id").val("0");
+                $("#WorkHeldUpOtherReason").val("");
+                $("#otherReasonError").text("");
+
+                toggleOtherReason();
+                saveBtn.textContent = "Save";
+            }
+
             $("#resetBtn").on("click", resetForm);
 
             $("#monthlyLcStatusForm").on("submit", function (e) {
                 e.preventDefault();
                 const lcNo = Number($("#LcNo").val());
-                if (!Number.isInteger(lcNo) || lcNo <= 0) { message("Please enter a valid LC No.", true); $("#LcNo").trigger("focus"); return; }
+                if (!Number.isInteger(lcNo) || lcNo <= 0) {
+                    message("Please enter a valid LC No.", true);
+                    $("#LcNo").trigger("focus");
+                    return;
+                }
+                if ($("#WorkHeldUpReason").val() === "Other" && !$("#WorkHeldUpOtherReason").val().trim()) {
+                    $("#otherReasonError").text("Please specify the other reason.");
+                    $("#WorkHeldUpOtherReason").trigger("focus");
+                    message("Please specify the other reason.", true);
+                    return;
+                }
                 const model = {
                     id: Number($("#Id").val() || 0), lcNo,
                     division: $("#Division").val(), lcName: $("#LcName").val(), section: $("#Section").val(), km: $("#Km").val(),
                     executingAgencyRailway: $("#ExecutingAgencyRailway").val(), executingAgencyApproach: $("#ExecutingAgencyApproach").val(),
-                    roadType: $("#RoadType").val(), workHeldUpReason: $("#WorkHeldUpReason").val(), rlyProgress: $("#RlyProgress").val(),
+                    roadType: $("#RoadType").val(),workHeldUpReason: $("#WorkHeldUpReason").val(),workHeldUpOtherReason: $("#WorkHeldUpOtherReason").val().trim(),rlyProgress: $("#RlyProgress").val(),
                     approachProgress: $("#ApproachProgress").val(), statusAsOnDate: $("#StatusAsOnDate").val() || null,
                     workStatusWeek1: $("#WorkStatusWeek1").val(), workStatusWeek2: $("#WorkStatusWeek2").val(),
                     workStatusWeek3: $("#WorkStatusWeek3").val(), workStatusWeek4: $("#WorkStatusWeek4").val()
@@ -225,6 +350,11 @@
                 $("#LcName").val(row.lcName || ""); $("#Section").val(row.section || ""); $("#Km").val(row.km || "");
                 $("#ExecutingAgencyRailway").val(row.executingAgencyRailway || ""); $("#ExecutingAgencyApproach").val(row.executingAgencyApproach || "");
                 $("#RoadType").val(row.roadType || ""); $("#WorkHeldUpReason").val(row.workHeldUpReason || "");
+                $("#WorkHeldUpOtherReason").val(
+                    row.workHeldUpOtherReason || ""
+                );
+
+                toggleOtherReason();
                 $("#RlyProgress").val(row.rlyProgress || ""); $("#ApproachProgress").val(row.approachProgress || "");
                 $("#StatusAsOnDate").val(inputDate(row.statusAsOnDate)); $("#WorkStatusWeek1").val(row.workStatusWeek1 || "");
                 $("#WorkStatusWeek2").val(row.workStatusWeek2 || ""); $("#WorkStatusWeek3").val(row.workStatusWeek3 || "");
@@ -245,6 +375,24 @@
                     error: function (xhr) { console.error("Delete failed:", xhr.responseText); message("Delete failed. Check server response and logs.", true); }
                 });
             });
+        });
+
+        function toggleOtherReason() {
+            const isOther = $("#WorkHeldUpReason").val() === "Other";
+
+            $("#otherReasonContainer").toggle(isOther);
+            $("#WorkHeldUpOtherReason").prop("required", isOther);
+
+            if (!isOther) {
+                $("#WorkHeldUpOtherReason").val("");
+                $("#otherReasonError").text("");
+            }
+        }
+
+        // Set the correct visibility on initial load.
+        $(function () {
+            $("#WorkHeldUpReason").on("change", toggleOtherReason);
+            toggleOtherReason();
         });
     </script>
 }

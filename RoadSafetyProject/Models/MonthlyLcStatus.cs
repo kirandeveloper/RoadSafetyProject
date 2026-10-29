@@ -23,5 +23,6 @@ namespace RoadSafetyProject.Models
         public string? WorkStatusWeek4 { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
+        public string? WorkHeldUpOtherReason { get; set; }
     }
 }

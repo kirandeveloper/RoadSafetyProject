@@ -17,7 +17,7 @@ namespace RoadSafetyProject.Pages
 
         public void OnGet()
         {
-            // The table retrieves records using ?handler=List.
+            // The page loads table data through ?handler=List.
         }
 
         public IActionResult OnGetList()
@@ -28,6 +28,7 @@ namespace RoadSafetyProject.Pages
             }
             catch (Exception ex)
             {
+                // The message is useful during development; log the exception in production.
                 return new JsonResult(new { success = false, message = "Failed to load records: " + ex.Message })
                 {
                     StatusCode = 500
@@ -54,6 +55,7 @@ namespace RoadSafetyProject.Pages
             }
         }
 
+        [ValidateAntiForgeryToken]
         public IActionResult OnPostSave([FromBody] MonthlyLcStatus model)
         {
             if (model == null)
@@ -66,7 +68,6 @@ namespace RoadSafetyProject.Pages
             {
                 if (model.Id > 0)
                 {
-                    // MonthlyLcStatusRepository.Update returns bool.
                     bool updated = _repo.Update(model);
                     if (!updated)
                         return new JsonResult(new { success = false, message = "Record not found or could not be updated." }) { StatusCode = 404 };
@@ -83,6 +84,7 @@ namespace RoadSafetyProject.Pages
             }
         }
 
+        [ValidateAntiForgeryToken]
         public IActionResult OnPostDelete(int id)
         {
             if (id <= 0)

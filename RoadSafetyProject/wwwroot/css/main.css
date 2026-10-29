@@ -1716,6 +1716,97 @@ iframe {
 	margin-top: 15px
 }
 
+.dt-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem;
+	margin-bottom: .75rem;
+}
+
+	.dt-buttons .dt-button, .dt-buttons button {
+		display: inline-flex !important;
+		align-items: center;
+		gap: .35rem;
+		padding: .45rem .75rem !important;
+		border-radius: .375rem !important;
+		border: 0 !important;
+		color: #fff !important;
+		font-size: .875rem !important;
+		cursor: pointer;
+	}
+
+	.dt-buttons .buttons-excel {
+		background: #198754 !important;
+	}
+
+	.dt-buttons .buttons-pdf {
+		background: #dc3545 !important;
+	}
+
+	.dt-buttons .buttons-print {
+		background: #0d6efd !important;
+	}
+
+.dataTables_wrapper .dataTables_filter {
+	margin-bottom: .75rem;
+}
+
+#monthlyLcStatusTable {
+	width: 100% !important;
+}
+
+	#monthlyLcStatusTable td {
+		vertical-align: middle;
+	}
+
+.action-buttons {
+	display: flex;
+	gap: .35rem;
+	white-space: nowrap;
+}
+
+.status-message {
+	display: none;
+	margin-top: 1rem;
+}
+
+/* Icon-only links: no buttons */
+.dt-action-link,
+.dt-button.dt-action-link {
+	display: inline !important;
+	background: none !important;
+	border: none !important;
+	box-shadow: none !important;
+	padding: 0 !important;
+	margin: 0 8px 0 0 !important;
+	text-decoration: none !important;
+	cursor: pointer;
+}
+
+	.dt-action-link i {
+		font-size: 25px;
+		line-height: 1;
+	}
+
+.print-icon i {
+	color: #143b70 !important;
+}
+
+.excel-icon i {
+	color: #00b51a !important;
+}
+
+.pdf-icon i {
+	color: #e53935 !important;
+}
+
+.colvis-icon i {
+	color: #6c757d !important;
+}
+
+.dt-action-link:hover {
+	opacity: 0.7;
+}
 
 /* ===========================
    Tablet

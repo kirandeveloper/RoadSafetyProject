@@ -8,6 +8,70 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+<style>
+    /* Print / Excel / PDF: clickable icon links only, no button chrome */
+    /* Remove button background and make width fit the icon */
+    .dt-buttons .dt-button.dt-action-link,
+    .dt-buttons button.dt-action-link,
+    .dt-buttons a.dt-action-link {
+        width: 30px !important;
+        min-width: 0 !important;
+        height: auto !important;
+        padding: 2px 5px !important;
+        margin: 0 5px 0 0 !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+        border-radius: 0 !important;
+        text-decoration: none !important;
+    }
+
+    .dt-buttons{
+        display:block !important;
+    }
+
+    /* Icon size */
+    .dt-action-link i {
+        display: inline-block;
+        font-size: 25px !important;
+        line-height: 1 !important;
+    }
+
+    /* Icon colors */
+    .dt-action-link.print-icon i {
+        color: #143b70 !important;
+    }
+
+    .dt-action-link.excel-icon i {
+        color: #00b51a !important;
+    }
+
+    .dt-action-link.pdf-icon i {
+        color: #e53935 !important;
+    }
+
+    /* Prevent background on hover, focus and active */
+    .dt-buttons .dt-button.dt-action-link:hover,
+    .dt-buttons .dt-button.dt-action-link:focus,
+    .dt-buttons .dt-button.dt-action-link:active {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        opacity: 0.75;
+    }
+    .dt-buttons .buttons-excel{
+       background: none !important;
+    }
+    .dt-buttons .buttons-pdf{
+        background: none !important;
+    }
+    .dt-buttons .buttons-print{
+        background: none !important;
+    }
+</style>
+
 <div class="content-wrapper">
     <div class="container-fluid mb-4">
         <div class="col-md-12">
